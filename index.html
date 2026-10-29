@@ -2,8 +2,19 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Al-Tuba Oil Depot</title>
+<meta name="theme-color" content="#0b3d5c">
+<meta name="description" content="Oil Tanker Loading Platforms">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Al-Tuba">
+
+<!-- رابط ملف المانيفست (للتثبيت) -->
+<link rel="manifest" href="manifest.json">
+
+<!-- أيقونة آيفون -->
+<link rel="apple-touch-icon" href="https://placehold.co/180x180/0b3d5c/ffffff?text=Al-Tuba">
 
 <!-- مكتبة تحويل البطاقة إلى صورة -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -18,7 +29,7 @@
     align-items:center;
     justify-content:center;
     gap:18px;
-    padding:24px 16px;
+    padding:24px 16px calc(24px + env(safe-area-inset-bottom));
     font-family:"Segoe UI", Tahoma, Arial, sans-serif;
     background:radial-gradient(circle at 20% 10%, #1b4b68, #0a1c28 65%);
     color:#0f172a;
@@ -283,7 +294,7 @@ btnWa.addEventListener('click', async () => {
     const fileName = buildFileName();
     const file     = new File([blob], fileName, { type: 'image/png' });
 
-    /* مشاركة ملف الصورة فقط — لا text ولا title ولا أي شيء آخر */
+    /* مشاركة ملف الصورة فقط — بدون text ولا title */
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       try {
         await navigator.share({ files: [file] });
@@ -292,7 +303,7 @@ btnWa.addEventListener('click', async () => {
         btnWa.textContent = oldText;
         return;
       } catch (err) {
-        if (err.name === 'AbortError') {          /* المستخدم أغلق نافذة المشاركة */
+        if (err.name === 'AbortError') {
           hideOverlay();
           btnWa.disabled = false;
           btnWa.textContent = oldText;
@@ -302,7 +313,7 @@ btnWa.addEventListener('click', async () => {
       }
     }
 
-    /* الحل الاحتياطي (حاسب) — حفظ الصورة فقط بدون فتح واتساب بنص */
+    /* الحل الاحتياطي (حاسب) — حفظ الصورة فقط */
     hideOverlay();
     downloadBlob(blob, fileName);
     btnWa.disabled = false;
@@ -347,6 +358,15 @@ btnClear.addEventListener('click', () => {
   });
   document.getElementById('tankers').focus();
 });
+
+/* ================= تسجيل Service Worker (PWA) ================= */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(() => console.log('Service Worker جاهز ✓'))
+      .catch(err => console.log('فشل تسجيل Service Worker:', err));
+  });
+}
 </script>
 
 </body>
