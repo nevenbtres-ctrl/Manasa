@@ -14,6 +14,7 @@
 <link rel="apple-touch-icon" href="https://placehold.co/180x180/0b3d5c/ffffff?text=Al-Tuba">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
@@ -87,7 +88,6 @@
 
   .sep{height:1px;background:#e6edf3;margin:8px 0}
 
-  /* الحقول (رقم + تاريخ) بتنسيق موحد */
   input[type=number],
   input[type=date]{
     width:150px;flex:0 0 auto;
@@ -129,15 +129,126 @@
   .btn:hover{filter:brightness(1.08)}
   .btn:active{transform:scale(.97)}
   .btn:disabled{opacity:.6;cursor:not-allowed}
-  .btn.wa   {background:linear-gradient(135deg,#25d366,#128c7e)}
-  .btn.save {background:linear-gradient(135deg,#2b7fb8,#0b3d5c)}
-  .btn.clear{background:linear-gradient(135deg,#ef4444,#b91c1c)}
+  .btn.wa     {background:linear-gradient(135deg,#25d366,#128c7e)}
+  .btn.save   {background:linear-gradient(135deg,#2b7fb8,#0b3d5c)}
+  .btn.archive{background:linear-gradient(135deg,#8b5cf6,#6d28d9)}
+  .btn.clear  {background:linear-gradient(135deg,#ef4444,#b91c1c)}
+
+  /* ===== نافذة الأرشيف ===== */
+  .modal{
+    display:none;
+    position:fixed;inset:0;
+    background:rgba(6,20,30,.75);
+    z-index:1000;
+    align-items:center;justify-content:center;
+    padding:12px;
+  }
+  .modal.show{display:flex}
+
+  .modal-content{
+    background:#fff;
+    border-radius:14px;
+    width:100%;max-width:560px;
+    max-height:90vh;
+    display:flex;flex-direction:column;
+    overflow:hidden;
+    box-shadow:0 20px 60px rgba(0,0,0,.4);
+  }
+  .modal-header{
+    padding:14px 18px;
+    background:linear-gradient(135deg,#0b3d5c,#14719c);
+    color:#fff;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .modal-header h2{font-size:17px;font-weight:800}
+  .close-btn{
+    background:transparent;border:0;
+    color:#fff;font-size:26px;line-height:1;
+    cursor:pointer;padding:0 4px;
+  }
+
+  .modal-toolbar{
+    padding:10px 12px;
+    background:#f4f8fb;
+    border-bottom:1px solid #e3edf4;
+    display:flex;gap:8px;flex-wrap:wrap;
+  }
+  .modal-toolbar input{
+    flex:1 1 140px;
+    padding:9px 12px;
+    border:1px solid #cbdce8;
+    border-radius:9px;
+    font-family:inherit;font-size:14px;
+    background:#fff;outline:none;
+  }
+  .modal-toolbar input:focus{
+    border-color:#14719c;
+    box-shadow:0 0 0 3px rgba(20,113,156,.15);
+  }
+  .modal-toolbar .btn{
+    flex:0 0 auto;
+    padding:9px 14px;font-size:13px;border-radius:9px;
+  }
+  .btn.excel{background:linear-gradient(135deg,#1e8e3e,#0d652d)}
+  .btn.trash{background:linear-gradient(135deg,#ef4444,#b91c1c)}
+
+  .modal-body{
+    padding:12px;
+    overflow-y:auto;
+    flex:1;
+  }
+
+  .archive-count{
+    text-align:center;
+    color:#5b7a92;
+    font-size:12px;font-weight:600;
+    padding:4px 0 10px;
+  }
+
+  .archive-item{
+    border:1px solid #cfe4f0;
+    border-radius:10px;
+    padding:10px 12px;
+    margin-bottom:8px;
+    background:#f8fbfd;
+  }
+  .archive-item-header{
+    display:flex;justify-content:space-between;align-items:center;
+    padding-bottom:8px;margin-bottom:8px;
+    border-bottom:1px dashed #cfe4f0;
+    font-size:13px;font-weight:700;color:#0b3d5c;
+    gap:6px;flex-wrap:wrap;
+  }
+  .archive-item-header .del-btn{
+    background:transparent;border:0;
+    font-size:16px;cursor:pointer;
+    padding:2px 4px;opacity:.7;
+  }
+  .archive-item-header .del-btn:hover{opacity:1}
+
+  .archive-item-body{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:6px 12px;
+    font-size:13px;color:#33506b;
+  }
+  .archive-item-body b{
+    color:#0b3d5c;font-weight:800;
+    direction:ltr;display:inline-block;
+  }
+
+  .empty{
+    text-align:center;
+    padding:30px 10px;
+    color:#8ba3b8;
+    font-weight:600;font-size:14px;
+  }
 
   #overlay{
     position:fixed;inset:0;
     background:rgba(6,20,30,.65);
     display:none;align-items:center;justify-content:center;
-    z-index:999;color:#fff;font-weight:700;font-size:15px;
+    z-index:1200;color:#fff;font-weight:700;font-size:15px;
   }
   #overlay.show{display:flex}
   #overlay .box{
@@ -158,6 +269,7 @@
     input[type=number],
     input[type=date]{width:128px;font-size:14px}
     .head h1{font-size:19px}
+    .archive-item-body{grid-template-columns:1fr}
   }
 </style>
 </head>
@@ -165,17 +277,14 @@
 <body>
 
   <div class="card" id="card">
-
     <div class="head">
       <h1>Al-Tuba Oil Depot</h1>
       <h2>Oil Tanker Loading Platforms</h2>
     </div>
 
     <div class="body">
-
       <div class="site">موقع شمعات تحميل (مستودع الطوبة)</div>
 
-      <!-- التاريخ (إدخال يدوي) -->
       <div class="row">
         <label class="lbl" for="dateInput">التاريخ</label>
         <input id="dateInput" type="date">
@@ -183,13 +292,11 @@
 
       <div class="sep"></div>
 
-      <!-- عدد الصهاريج (يوم) -->
       <div class="row">
         <label class="lbl" for="tankers">عدد الصهاريج (يوم)</label>
         <input id="tankers" type="number" step="any" inputmode="decimal">
       </div>
 
-      <!-- الكمية بالبرميل (يوم) -->
       <div class="row">
         <label class="lbl" for="barrels">الكمية بالبرميل (يوم)</label>
         <input id="barrels" type="number" step="any" inputmode="decimal">
@@ -204,21 +311,41 @@
         <label class="lbl" for="cumBarrels">الكمية التراكمية بالبرميل</label>
         <input id="cumBarrels" type="number" step="any" inputmode="decimal">
       </div>
-
     </div>
 
     <div class="foot">Programming by Osama Abdul-Abbad</div>
   </div>
 
   <div class="btns">
-    <button class="btn wa"    id="btnWa">إرسال الصورة عبر واتساب</button>
-    <button class="btn save"  id="btnSave">حفظ صورة</button>
-    <button class="btn clear" id="btnClear">مسح</button>
+    <button class="btn wa"      id="btnWa">إرسال الصورة عبر واتساب</button>
+    <button class="btn save"    id="btnSave">حفظ صورة</button>
+    <button class="btn archive" id="btnArchive">الأرشيف</button>
+    <button class="btn clear"   id="btnClear">مسح</button>
+  </div>
+
+  <!-- ===== نافذة الأرشيف ===== -->
+  <div id="archiveModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>📂 أرشيف الصهاريج</h2>
+        <button class="close-btn" id="closeArchive">×</button>
+      </div>
+      <div class="modal-toolbar">
+        <input type="text" id="archiveSearch" placeholder="🔍 بحث بالتاريخ أو الرقم...">
+        <button class="btn excel" id="btnExportExcel">تصدير Excel</button>
+        <button class="btn trash" id="btnClearArchive">حذف الكل</button>
+      </div>
+      <div class="modal-body">
+        <div class="archive-count" id="archiveCount"></div>
+        <div id="archiveList"></div>
+      </div>
+    </div>
   </div>
 
   <div id="overlay"><div class="box"><span class="spin"></span><span id="ovText">جاري تحضير الصورة...</span></div></div>
 
 <script>
+/* ================= أدوات عامة ================= */
 const pad = n => String(n).padStart(2, '0');
 
 const overlay  = document.getElementById('overlay');
@@ -242,9 +369,7 @@ async function cardToBlob(){
     throw new Error('تعذّر تحميل مكتبة الصور، تحقق من الاتصال بالإنترنت.');
   }
   const canvas = await html2canvas(cardEl, {
-    scale: 2,
-    backgroundColor: '#ffffff',
-    useCORS: true
+    scale: 2, backgroundColor: '#ffffff', useCORS: true
   });
   const blob = await new Promise(res => canvas.toBlob(res, 'image/png', 1.0));
   if (!blob) throw new Error('فشل إنشاء الصورة.');
@@ -262,8 +387,179 @@ function downloadBlob(blob, fileName){
   setTimeout(() => URL.revokeObjectURL(url), 4000);
 }
 
-/* ===== إرسال الصورة فقط عبر واتساب (بدون نص) ===== */
+/* ================= الأرشيف ================= */
+const ARCHIVE_KEY = 'al_tuba_archive';
+const archiveModal  = document.getElementById('archiveModal');
+const archiveList   = document.getElementById('archiveList');
+const archiveSearch = document.getElementById('archiveSearch');
+const archiveCount  = document.getElementById('archiveCount');
+
+function getArchive(){
+  try { return JSON.parse(localStorage.getItem(ARCHIVE_KEY) || '[]'); }
+  catch { return []; }
+}
+function setArchive(arr){
+  localStorage.setItem(ARCHIVE_KEY, JSON.stringify(arr));
+}
+
+function formatISODate(iso){
+  if (!iso) return '—';
+  const [y,m,d] = iso.split('-');
+  if (!y||!m||!d) return iso;
+  return `${d}/${m}/${y}`;
+}
+
+function escapeHTML(s){
+  return String(s).replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}
+
+/* حفظ تلقائي — يُستدعى من زر واتساب وزر حفظ الصورة */
+function saveToArchive(){
+  const date       = document.getElementById('dateInput').value;
+  const tankers    = document.getElementById('tankers').value;
+  const barrels    = document.getElementById('barrels').value;
+  const cumTankers = document.getElementById('cumTankers').value;
+  const cumBarrels = document.getElementById('cumBarrels').value;
+
+  if (!date && !tankers && !barrels && !cumTankers && !cumBarrels) return;
+
+  const archive = getArchive();
+
+  /* تجاهل التكرار المطابق لآخر سجل */
+  if (archive.length > 0){
+    const last = archive[0];
+    if (last.date === date &&
+        last.tankers === tankers &&
+        last.barrels === barrels &&
+        last.cumTankers === cumTankers &&
+        last.cumBarrels === cumBarrels){
+      return;
+    }
+  }
+
+  const now = new Date();
+  const savedAt = `${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+
+  archive.unshift({
+    id: Date.now(),
+    date, savedAt,
+    tankers, barrels, cumTankers, cumBarrels
+  });
+  setArchive(archive);
+}
+
+function renderArchive(filter = ''){
+  const archive = getArchive();
+  let filtered = archive;
+
+  if (filter.trim()){
+    const f = filter.trim().toLowerCase();
+    filtered = archive.filter(e =>
+      String(e.date || '').toLowerCase().includes(f) ||
+      String(e.savedAt || '').toLowerCase().includes(f) ||
+      String(e.tankers || '').includes(f) ||
+      String(e.barrels || '').includes(f) ||
+      String(e.cumTankers || '').includes(f) ||
+      String(e.cumBarrels || '').includes(f) ||
+      formatISODate(e.date).includes(f)
+    );
+  }
+
+  archiveCount.textContent = `إجمالي السجلات: ${filtered.length}`;
+
+  if (filtered.length === 0){
+    archiveList.innerHTML = '<div class="empty">لا توجد سجلات</div>';
+    return;
+  }
+
+  archiveList.innerHTML = filtered.map(e => `
+    <div class="archive-item">
+      <div class="archive-item-header">
+        <span>📅 ${formatISODate(escapeHTML(e.date))}</span>
+        <span>🕐 ${escapeHTML(e.savedAt)}</span>
+        <button class="del-btn" data-id="${e.id}" title="حذف">🗑️</button>
+      </div>
+      <div class="archive-item-body">
+        <div>عدد الصهاريج (يوم): <b>${escapeHTML(e.tankers) || '—'}</b></div>
+        <div>الكمية بالبرميل (يوم): <b>${escapeHTML(e.barrels) || '—'}</b></div>
+        <div>العدد التراكمي: <b>${escapeHTML(e.cumTankers) || '—'}</b></div>
+        <div>الكمية التراكمية: <b>${escapeHTML(e.cumBarrels) || '—'}</b></div>
+      </div>
+    </div>
+  `).join('');
+
+  archiveList.querySelectorAll('.del-btn').forEach(btn => {
+    btn.addEventListener('click', () => deleteEntry(Number(btn.dataset.id)));
+  });
+}
+
+function deleteEntry(id){
+  if (!confirm('حذف هذا السجل؟')) return;
+  setArchive(getArchive().filter(e => e.id !== id));
+  renderArchive(archiveSearch.value);
+}
+
+function openArchive(){
+  archiveSearch.value = '';
+  renderArchive();
+  archiveModal.classList.add('show');
+}
+function closeArchive(){
+  archiveModal.classList.remove('show');
+}
+
+/* تصدير Excel */
+function exportToExcel(){
+  const archive = getArchive();
+  if (archive.length === 0){
+    alert('الأرشيف فارغ، لا يوجد ما يُصدَّر.');
+    return;
+  }
+  if (typeof XLSX === 'undefined'){
+    alert('تعذّر تحميل مكتبة Excel، تحقق من اتصال الإنترنت.');
+    return;
+  }
+
+  const rows = archive.map(e => ({
+    'التاريخ'                : formatISODate(e.date),
+    'وقت الحفظ'              : e.savedAt || '',
+    'عدد الصهاريج (يوم)'     : e.tankers || '',
+    'الكمية بالبرميل (يوم)'  : e.barrels || '',
+    'العدد التراكمي للصهاريج': e.cumTankers || '',
+    'الكمية التراكمية بالبرميل': e.cumBarrels || ''
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(rows);
+  ws['!cols'] = [
+    {wch:14},{wch:20},{wch:22},{wch:26},{wch:28},{wch:30}
+  ];
+  try { ws['!views'] = [{ RTL: true }]; } catch(_){}
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'الأرشيف');
+  XLSX.writeFile(wb, 'ارشيف الصهاريج.xlsx');
+}
+
+/* ربط أزرار الأرشيف */
+document.getElementById('btnArchive').addEventListener('click', openArchive);
+document.getElementById('closeArchive').addEventListener('click', closeArchive);
+document.getElementById('btnExportExcel').addEventListener('click', exportToExcel);
+document.getElementById('btnClearArchive').addEventListener('click', () => {
+  if (!confirm('حذف جميع سجلات الأرشيف نهائياً؟')) return;
+  setArchive([]);
+  renderArchive();
+});
+archiveSearch.addEventListener('input', e => renderArchive(e.target.value));
+archiveModal.addEventListener('click', e => {
+  if (e.target === archiveModal) closeArchive();
+});
+
+/* ================= إرسال الصورة فقط عبر واتساب ================= */
 btnWa.addEventListener('click', async () => {
+  saveToArchive();                        /* ← حفظ تلقائي */
+
   const oldText = btnWa.textContent;
   btnWa.disabled = true;
   showOverlay('جاري تحضير الصورة...');
@@ -273,17 +569,15 @@ btnWa.addEventListener('click', async () => {
     const fileName = buildFileName();
     const file     = new File([blob], fileName, { type: 'image/png' });
 
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      try {
-        await navigator.share({ files: [file] });
-        hideOverlay();
-        btnWa.disabled = false;
+    if (navigator.canShare && navigator.canShare({ files: [file] })){
+      try{
+        await navigator.share({ files: [file] });   /* صورة فقط بدون نص */
+        hideOverlay(); btnWa.disabled = false;
         btnWa.textContent = oldText;
         return;
-      } catch (err) {
-        if (err.name === 'AbortError') {
-          hideOverlay();
-          btnWa.disabled = false;
+      }catch(err){
+        if (err.name === 'AbortError'){
+          hideOverlay(); btnWa.disabled = false;
           btnWa.textContent = oldText;
           return;
         }
@@ -301,8 +595,7 @@ btnWa.addEventListener('click', async () => {
       'تم حفظ الصورة باسم:\n' + fileName +
       '\n\nافتح واتساب وأرفق الصورة يدوياً (📎).'
     );
-
-  } catch (err) {
+  }catch(err){
     hideOverlay();
     btnWa.disabled = false;
     btnWa.textContent = oldText;
@@ -310,24 +603,26 @@ btnWa.addEventListener('click', async () => {
   }
 });
 
-/* ===== حفظ صورة ===== */
+/* ================= حفظ صورة ================= */
 btnSave.addEventListener('click', async () => {
+  saveToArchive();                        /* ← حفظ تلقائي */
+
   const oldText = btnSave.textContent;
   btnSave.disabled = true;
   showOverlay('جاري حفظ الصورة...');
-  try {
+  try{
     const blob = await cardToBlob();
     downloadBlob(blob, buildFileName());
-  } catch (err) {
+  }catch(err){
     alert('حدث خطأ أثناء حفظ الصورة: ' + err.message);
-  } finally {
+  }finally{
     hideOverlay();
     btnSave.disabled = false;
     btnSave.textContent = oldText;
   }
 });
 
-/* ===== مسح ===== */
+/* ================= مسح النموذج ================= */
 btnClear.addEventListener('click', () => {
   if (!confirm('هل تريد مسح جميع الحقول؟')) return;
   ['dateInput','tankers','barrels','cumTankers','cumBarrels'].forEach(id => {
@@ -336,8 +631,8 @@ btnClear.addEventListener('click', () => {
   document.getElementById('dateInput').focus();
 });
 
-/* ===== Service Worker ===== */
-if ('serviceWorker' in navigator) {
+/* ================= Service Worker ================= */
+if ('serviceWorker' in navigator){
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js')
       .then(() => console.log('Service Worker جاهز ✓'))
