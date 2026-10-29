@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Al-Tuba Oil Depot</title>
+
+<!-- مكتبة تحويل البطاقة إلى صورة -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+
+  body{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:18px;
+    padding:24px 16px;
+    font-family:"Segoe UI", Tahoma, Arial, sans-serif;
+    background:radial-gradient(circle at 20% 10%, #1b4b68, #0a1c28 65%);
+    color:#0f172a;
+  }
+
+  .card{
+    width:100%;
+    max-width:470px;
+    background:#ffffff;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 18px 45px rgba(0,0,0,.45);
+  }
+
+  .head{
+    position:relative;
+    padding:20px 18px 16px;
+    text-align:center;
+    color:#fff;
+    background:linear-gradient(135deg,#0b3d5c 0%,#14719c 100%);
+  }
+  .head::after{
+    content:"";
+    position:absolute;
+    bottom:0; left:50%;
+    transform:translateX(-50%);
+    width:90px; height:4px;
+    border-radius:4px 4px 0 0;
+    background:#f0b429;
+  }
+  .head h1{font-size:22px;font-weight:800;letter-spacing:.6px}
+  .head h2{margin-top:6px;font-size:13px;font-weight:500;letter-spacing:.5px;opacity:.88}
+
+  .body{padding:16px 18px 10px}
+
+  .site{
+    text-align:center;
+    background:#eef6fb;
+    border:1px solid #cfe4f0;
+    color:#0b3d5c;
+    font-weight:700;
+    font-size:14px;
+    border-radius:10px;
+    padding:9px 10px;
+    margin-bottom:14px;
+  }
+
+  .row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:8px 0;
+    border-bottom:1px dashed #e6edf3;
+  }
+  .row:last-child{border-bottom:0}
+
+  .lbl{font-size:14px;font-weight:600;color:#33506b;white-space:nowrap}
+
+  .val{
+    font-size:15px;font-weight:800;color:#0b3d5c;
+    direction:ltr;font-variant-numeric:tabular-nums;
+  }
+
+  .sep{height:1px;background:#e6edf3;margin:8px 0}
+
+  input[type=number]{
+    width:150px;flex:0 0 auto;
+    padding:7px 10px;
+    font-family:inherit;font-size:15px;font-weight:800;
+    text-align:center;direction:ltr;
+    color:#0b3d5c;background:#f8fbfd;
+    border:1px solid #cbdce8;border-radius:9px;
+    outline:none;
+    transition:border-color .15s, box-shadow .15s, background .15s;
+  }
+  input[type=number]:focus{
+    background:#fff;border-color:#14719c;
+    box-shadow:0 0 0 3px rgba(20,113,156,.15);
+  }
+  input[type=number]::-webkit-outer-spin-button,
+  input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  input[type=number]{-moz-appearance:textfield;appearance:textfield}
+
+  .foot{
+    text-align:center;font-size:12px;font-weight:600;letter-spacing:.4px;
+    padding:12px;color:#5b7a92;background:#f4f8fb;border-top:1px solid #e3edf4;
+  }
+
+  .btns{
+    width:100%;max-width:470px;
+    display:flex;flex-wrap:wrap;gap:10px;
+  }
+  .btn{
+    flex:1 1 130px;border:0;border-radius:12px;
+    padding:13px 10px;
+    font-family:inherit;font-size:14px;font-weight:700;
+    color:#fff;cursor:pointer;
+    transition:transform .15s, filter .15s;
+  }
+  .btn:hover{filter:brightness(1.08)}
+  .btn:active{transform:scale(.97)}
+  .btn:disabled{opacity:.6;cursor:not-allowed}
+  .btn.wa   {background:linear-gradient(135deg,#25d366,#128c7e)}
+  .btn.save {background:linear-gradient(135deg,#2b7fb8,#0b3d5c)}
+  .btn.clear{background:linear-gradient(135deg,#ef4444,#b91c1c)}
+
+  #overlay{
+    position:fixed;inset:0;
+    background:rgba(6,20,30,.65);
+    display:none;align-items:center;justify-content:center;
+    z-index:999;color:#fff;font-weight:700;font-size:15px;
+  }
+  #overlay.show{display:flex}
+  #overlay .box{
+    background:#0b3d5c;border:1px solid #14719c;
+    padding:18px 26px;border-radius:14px;
+    display:flex;align-items:center;gap:12px;
+  }
+  .spin{
+    width:20px;height:20px;border-radius:50%;
+    border:3px solid rgba(255,255,255,.3);
+    border-top-color:#f0b429;
+    animation:sp .8s linear infinite;
+  }
+  @keyframes sp{to{transform:rotate(360deg)}}
+
+  @media (max-width:420px){
+    .lbl{font-size:12.5px;white-space:normal}
+    input[type=number]{width:128px;font-size:14px}
+    .head h1{font-size:19px}
+  }
+</style>
+</head>
+
+<body>
+
+  <!-- ===== البطاقة (تُحوَّل إلى صورة) ===== -->
+  <div class="card" id="card">
+
+    <div class="head">
+      <h1>Al-Tuba Oil Depot</h1>
+      <h2>Oil Tanker Loading Platforms</h2>
+    </div>
+
+    <div class="body">
+
+      <div class="site">موقع شمعات تحميل (مستودع الطوبة)</div>
+
+      <div class="row">
+        <span class="lbl">التاريخ</span>
+        <span class="val" id="dateVal">--/--/----</span>
+      </div>
+      <div class="row">
+        <span class="lbl">الوقت</span>
+        <span class="val" id="timeVal">--:--:--</span>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="row">
+        <label class="lbl" for="tankers">عدد الصهاريج</label>
+        <input id="tankers" type="number" step="any" inputmode="decimal" value="165">
+      </div>
+
+      <div class="row">
+        <label class="lbl" for="barrels">الكمية بالبرميل</label>
+        <input id="barrels" type="number" step="any" inputmode="decimal" value="36500.088">
+      </div>
+
+      <div class="row">
+        <label class="lbl" for="cumTankers">العدد التراكمي للصهاريج</label>
+        <input id="cumTankers" type="number" step="any" inputmode="decimal" value="1136">
+      </div>
+
+      <div class="row">
+        <label class="lbl" for="cumBarrels">الكمية التراكمية بالبرميل</label>
+        <input id="cumBarrels" type="number" step="any" inputmode="decimal" value="251429.228">
+      </div>
+
+    </div>
+
+    <div class="foot">Programming by Osama Abdul-Abbad</div>
+  </div>
+
+  <!-- ===== الأزرار ===== -->
+  <div class="btns">
+    <button class="btn wa"    id="btnWa">إرسال الصورة عبر واتساب</button>
+    <button class="btn save"  id="btnSave">حفظ صورة</button>
+    <button class="btn clear" id="btnClear">مسح</button>
+  </div>
+
+  <div id="overlay"><div class="box"><span class="spin"></span><span id="ovText">جاري تحضير الصورة...</span></div></div>
+
+<script>
+/* ================= التاريخ والوقت التلقائي ================= */
+const dateEl = document.getElementById('dateVal');
+const timeEl = document.getElementById('timeVal');
+const pad = n => String(n).padStart(2, '0');
+
+function updateClock(){
+  const d = new Date();
+  dateEl.textContent = `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`;
+  let h = d.getHours();
+  const suffix = h >= 12 ? 'م' : 'ص';
+  h = h % 12 || 12;
+  timeEl.textContent = `${pad(h)}:${pad(d.getMinutes())}:${pad(d.getSeconds())} ${suffix}`;
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+/* ================= أدوات مساعدة ================= */
+const overlay  = document.getElementById('overlay');
+const ovText   = document.getElementById('ovText');
+const cardEl   = document.getElementById('card');
+const btnWa    = document.getElementById('btnWa');
+const btnSave  = document.getElementById('btnSave');
+const btnClear = document.getElementById('btnClear');
+
+const showOverlay = (t) => { ovText.textContent = t; overlay.classList.add('show'); };
+const hideOverlay = () => overlay.classList.remove('show');
+
+function buildFileName(){
+  const d = new Date();
+  const stamp = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}`;
+  return `Al-Tuba-Oil-Depot_${stamp}.png`;
+}
+
+async function cardToBlob(){
+  if (typeof html2canvas !== 'function'){
+    throw new Error('تعذّر تحميل مكتبة الصور، تحقق من الاتصال بالإنترنت.');
+  }
+  const canvas = await html2canvas(cardEl, {
+    scale: 2,
+    backgroundColor: '#ffffff',
+    useCORS: true
+  });
+  const blob = await new Promise(res => canvas.toBlob(res, 'image/png', 1.0));
+  if (!blob) throw new Error('فشل إنشاء الصورة.');
+  return blob;
+}
+
+function downloadBlob(blob, fileName){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+
+/* ================= إرسال الصورة فقط عبر واتساب (بدون أي نص) ================= */
+btnWa.addEventListener('click', async () => {
+  const oldText = btnWa.textContent;
+  btnWa.disabled = true;
+  showOverlay('جاري تحضير الصورة...');
+
+  try {
+    const blob     = await cardToBlob();
+    const fileName = buildFileName();
+    const file     = new File([blob], fileName, { type: 'image/png' });
+
+    /* مشاركة ملف الصورة فقط — لا text ولا title ولا أي شيء آخر */
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file] });
+        hideOverlay();
+        btnWa.disabled = false;
+        btnWa.textContent = oldText;
+        return;
+      } catch (err) {
+        if (err.name === 'AbortError') {          /* المستخدم أغلق نافذة المشاركة */
+          hideOverlay();
+          btnWa.disabled = false;
+          btnWa.textContent = oldText;
+          return;
+        }
+        console.log('المشاركة فشلت، سيتم الحفظ كحل احتياطي:', err);
+      }
+    }
+
+    /* الحل الاحتياطي (حاسب) — حفظ الصورة فقط بدون فتح واتساب بنص */
+    hideOverlay();
+    downloadBlob(blob, fileName);
+    btnWa.disabled = false;
+    btnWa.textContent = oldText;
+
+    alert(
+      'جهازك لا يدعم مشاركة الملفات مباشرة.\n' +
+      'تم حفظ الصورة باسم:\n' + fileName +
+      '\n\nافتح واتساب وأرفق الصورة يدوياً (📎).'
+    );
+
+  } catch (err) {
+    hideOverlay();
+    btnWa.disabled = false;
+    btnWa.textContent = oldText;
+    alert('حدث خطأ: ' + err.message);
+  }
+});
+
+/* ================= حفظ صورة فقط ================= */
+btnSave.addEventListener('click', async () => {
+  const oldText = btnSave.textContent;
+  btnSave.disabled = true;
+  showOverlay('جاري حفظ الصورة...');
+  try {
+    const blob = await cardToBlob();
+    downloadBlob(blob, buildFileName());
+  } catch (err) {
+    alert('حدث خطأ أثناء حفظ الصورة: ' + err.message);
+  } finally {
+    hideOverlay();
+    btnSave.disabled = false;
+    btnSave.textContent = oldText;
+  }
+});
+
+/* ================= مسح ================= */
+btnClear.addEventListener('click', () => {
+  if (!confirm('هل تريد مسح جميع الأرقام؟')) return;
+  ['tankers','barrels','cumTankers','cumBarrels'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('tankers').focus();
+});
+</script>
+
+</body>
+</html>
