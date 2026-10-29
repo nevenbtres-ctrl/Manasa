@@ -33,29 +33,19 @@
   }
 
   .card{
-    width:100%;
-    max-width:470px;
-    background:#ffffff;
-    border-radius:18px;
-    overflow:hidden;
+    width:100%;max-width:470px;
+    background:#ffffff;border-radius:18px;overflow:hidden;
     box-shadow:0 18px 45px rgba(0,0,0,.45);
   }
 
   .head{
-    position:relative;
-    padding:20px 18px 16px;
-    text-align:center;
-    color:#fff;
+    position:relative;padding:20px 18px 16px;text-align:center;color:#fff;
     background:linear-gradient(135deg,#0b3d5c 0%,#14719c 100%);
   }
   .head::after{
-    content:"";
-    position:absolute;
-    bottom:0; left:50%;
-    transform:translateX(-50%);
-    width:90px; height:4px;
-    border-radius:4px 4px 0 0;
-    background:#f0b429;
+    content:"";position:absolute;bottom:0;left:50%;
+    transform:translateX(-50%);width:90px;height:4px;
+    border-radius:4px 4px 0 0;background:#f0b429;
   }
   .head h1{font-size:22px;font-weight:800;letter-spacing:.6px}
   .head h2{margin-top:6px;font-size:13px;font-weight:500;letter-spacing:.5px;opacity:.88}
@@ -63,24 +53,14 @@
   .body{padding:16px 18px 10px}
 
   .site{
-    text-align:center;
-    background:#eef6fb;
-    border:1px solid #cfe4f0;
-    color:#0b3d5c;
-    font-weight:700;
-    font-size:14px;
-    border-radius:10px;
-    padding:9px 10px;
-    margin-bottom:14px;
+    text-align:center;background:#eef6fb;border:1px solid #cfe4f0;
+    color:#0b3d5c;font-weight:700;font-size:14px;
+    border-radius:10px;padding:9px 10px;margin-bottom:14px;
   }
 
   .row{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:12px;
-    padding:8px 0;
-    border-bottom:1px dashed #e6edf3;
+    display:flex;align-items:center;justify-content:space-between;
+    gap:12px;padding:8px 0;border-bottom:1px dashed #e6edf3;
   }
   .row:last-child{border-bottom:0}
 
@@ -90,13 +70,11 @@
 
   input[type=number],
   input[type=date]{
-    width:150px;flex:0 0 auto;
-    padding:7px 10px;
+    width:150px;flex:0 0 auto;padding:7px 10px;
     font-family:inherit;font-size:15px;font-weight:800;
     text-align:center;direction:ltr;
     color:#0b3d5c;background:#f8fbfd;
-    border:1px solid #cbdce8;border-radius:9px;
-    outline:none;
+    border:1px solid #cbdce8;border-radius:9px;outline:none;
     transition:border-color .15s, box-shadow .15s, background .15s;
   }
   input[type=number]:focus,
@@ -107,7 +85,6 @@
   input[type=number]::-webkit-outer-spin-button,
   input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
   input[type=number]{-moz-appearance:textfield;appearance:textfield}
-
   input[type=date]{font-size:14px;font-weight:700}
 
   .foot{
@@ -120,11 +97,9 @@
     display:flex;flex-wrap:wrap;gap:10px;
   }
   .btn{
-    flex:1 1 130px;border:0;border-radius:12px;
-    padding:13px 10px;
-    font-family:inherit;font-size:14px;font-weight:700;
-    color:#fff;cursor:pointer;
-    transition:transform .15s, filter .15s;
+    flex:1 1 130px;border:0;border-radius:12px;padding:13px 10px;
+    font-family:inherit;font-size:14px;font-weight:700;color:#fff;
+    cursor:pointer;transition:transform .15s, filter .15s;
   }
   .btn:hover{filter:brightness(1.08)}
   .btn:active{transform:scale(.97)}
@@ -134,50 +109,37 @@
   .btn.archive{background:linear-gradient(135deg,#8b5cf6,#6d28d9)}
   .btn.clear  {background:linear-gradient(135deg,#ef4444,#b91c1c)}
 
-  /* ===== نافذة الأرشيف ===== */
+  /* ===== النوافذ المنبثقة ===== */
   .modal{
-    display:none;
-    position:fixed;inset:0;
-    background:rgba(6,20,30,.75);
-    z-index:1000;
-    align-items:center;justify-content:center;
-    padding:12px;
+    display:none;position:fixed;inset:0;
+    background:rgba(6,20,30,.75);z-index:1000;
+    align-items:center;justify-content:center;padding:12px;
   }
   .modal.show{display:flex}
 
   .modal-content{
-    background:#fff;
-    border-radius:14px;
-    width:100%;max-width:560px;
-    max-height:90vh;
-    display:flex;flex-direction:column;
-    overflow:hidden;
+    background:#fff;border-radius:14px;width:100%;max-width:560px;
+    max-height:90vh;display:flex;flex-direction:column;overflow:hidden;
     box-shadow:0 20px 60px rgba(0,0,0,.4);
   }
   .modal-header{
-    padding:14px 18px;
-    background:linear-gradient(135deg,#0b3d5c,#14719c);
-    color:#fff;
-    display:flex;justify-content:space-between;align-items:center;
+    padding:14px 18px;background:linear-gradient(135deg,#0b3d5c,#14719c);
+    color:#fff;display:flex;justify-content:space-between;align-items:center;
   }
   .modal-header h2{font-size:17px;font-weight:800}
   .close-btn{
-    background:transparent;border:0;
-    color:#fff;font-size:26px;line-height:1;
-    cursor:pointer;padding:0 4px;
+    background:transparent;border:0;color:#fff;font-size:26px;
+    line-height:1;cursor:pointer;padding:0 4px;
   }
 
   .modal-toolbar{
-    padding:10px 12px;
-    background:#f4f8fb;
+    padding:10px 12px;background:#f4f8fb;
     border-bottom:1px solid #e3edf4;
-    display:flex;gap:8px;flex-wrap:wrap;
+    display:flex;gap:8px;flex-wrap:wrap;align-items:center;
   }
   .modal-toolbar input{
-    flex:1 1 140px;
-    padding:9px 12px;
-    border:1px solid #cbdce8;
-    border-radius:9px;
+    flex:1 1 140px;padding:9px 12px;
+    border:1px solid #cbdce8;border-radius:9px;
     font-family:inherit;font-size:14px;
     background:#fff;outline:none;
   }
@@ -185,32 +147,26 @@
     border-color:#14719c;
     box-shadow:0 0 0 3px rgba(20,113,156,.15);
   }
+  .modal-toolbar input[type=date]{
+    flex:0 0 145px;font-size:13px;direction:ltr;min-height:38px;
+  }
   .modal-toolbar .btn{
-    flex:0 0 auto;
-    padding:9px 14px;font-size:13px;border-radius:9px;
+    flex:0 0 auto;padding:9px 14px;font-size:13px;border-radius:9px;
   }
   .btn.excel{background:linear-gradient(135deg,#1e8e3e,#0d652d)}
   .btn.trash{background:linear-gradient(135deg,#ef4444,#b91c1c)}
+  .btn.reset{background:linear-gradient(135deg,#94a3b8,#64748b);padding:9px 12px;font-size:12px}
 
-  .modal-body{
-    padding:12px;
-    overflow-y:auto;
-    flex:1;
-  }
+  .modal-body{padding:12px;overflow-y:auto;flex:1}
 
   .archive-count{
-    text-align:center;
-    color:#5b7a92;
-    font-size:12px;font-weight:600;
-    padding:4px 0 10px;
+    text-align:center;color:#5b7a92;
+    font-size:12px;font-weight:600;padding:4px 0 10px;
   }
 
   .archive-item{
-    border:1px solid #cfe4f0;
-    border-radius:10px;
-    padding:10px 12px;
-    margin-bottom:8px;
-    background:#f8fbfd;
+    border:1px solid #cfe4f0;border-radius:10px;
+    padding:10px 12px;margin-bottom:8px;background:#f8fbfd;
   }
   .archive-item-header{
     display:flex;justify-content:space-between;align-items:center;
@@ -220,17 +176,14 @@
     gap:6px;flex-wrap:wrap;
   }
   .archive-item-header .del-btn{
-    background:transparent;border:0;
-    font-size:16px;cursor:pointer;
-    padding:2px 4px;opacity:.7;
+    background:transparent;border:0;font-size:16px;
+    cursor:pointer;padding:2px 4px;opacity:.7;
   }
   .archive-item-header .del-btn:hover{opacity:1}
 
   .archive-item-body{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:6px 12px;
-    font-size:13px;color:#33506b;
+    display:grid;grid-template-columns:1fr 1fr;
+    gap:6px 12px;font-size:13px;color:#33506b;
   }
   .archive-item-body b{
     color:#0b3d5c;font-weight:800;
@@ -238,15 +191,12 @@
   }
 
   .empty{
-    text-align:center;
-    padding:30px 10px;
-    color:#8ba3b8;
-    font-weight:600;font-size:14px;
+    text-align:center;padding:30px 10px;
+    color:#8ba3b8;font-weight:600;font-size:14px;
   }
 
   #overlay{
-    position:fixed;inset:0;
-    background:rgba(6,20,30,.65);
+    position:fixed;inset:0;background:rgba(6,20,30,.65);
     display:none;align-items:center;justify-content:center;
     z-index:1200;color:#fff;font-weight:700;font-size:15px;
   }
@@ -332,12 +282,49 @@
       </div>
       <div class="modal-toolbar">
         <input type="text" id="archiveSearch" placeholder="🔍 بحث بالتاريخ أو الرقم...">
-        <button class="btn excel" id="btnExportExcel">تصدير Excel</button>
-        <button class="btn trash" id="btnClearArchive">حذف الكل</button>
+        <input type="date" id="archiveDateFilter">
+        <button class="btn reset" id="btnResetFilter">🔄 الكل</button>
+        <button class="btn excel" id="btnExportExcel">📊 Excel</button>
+        <button class="btn trash" id="btnClearArchive">🗑️ حذف الكل</button>
       </div>
       <div class="modal-body">
         <div class="archive-count" id="archiveCount"></div>
         <div id="archiveList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== نافذة كلمة المرور ===== -->
+  <div id="passwordModal" class="modal">
+    <div class="modal-content" style="max-width:340px">
+      <div class="modal-header">
+        <h2>🔒 التحقق من الهوية</h2>
+        <button class="close-btn" id="closePassword">×</button>
+      </div>
+      <div class="modal-body" style="padding:20px">
+        <p style="text-align:center;color:#b91c1c;font-weight:700;margin-bottom:16px;font-size:14px;line-height:1.7">
+          غير مصرح لك الحذف إذا لم تمتلك كلمة المرور
+        </p>
+        <input type="password" id="passwordInput" inputmode="numeric"
+               placeholder="•••••••" maxlength="20"
+               style="width:100%;padding:12px;text-align:center;font-size:18px;
+                      border:2px solid #cbdce8;border-radius:10px;outline:none;
+                      direction:ltr;letter-spacing:4px;font-weight:700" />
+        <p id="passwordError"
+           style="text-align:center;color:#dc2626;font-size:13px;
+                  margin-top:10px;font-weight:700;display:none">
+          ❌ كلمة المرور غير صحيحة
+        </p>
+        <div style="display:flex;gap:8px;margin-top:14px">
+          <button class="btn" id="confirmPassword"
+                  style="flex:1;background:linear-gradient(135deg,#25d366,#128c7e)">
+            تأكيد
+          </button>
+          <button class="btn" id="cancelPassword"
+                  style="flex:1;background:linear-gradient(135deg,#94a3b8,#64748b)">
+            إلغاء
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -357,6 +344,30 @@ const btnClear = document.getElementById('btnClear');
 
 const showOverlay = (t) => { ovText.textContent = t; overlay.classList.add('show'); };
 const hideOverlay = () => overlay.classList.remove('show');
+
+/* Toast إشعار صغير */
+function showToast(message, duration = 2800){
+  const t = document.createElement('div');
+  t.textContent = message;
+  t.style.cssText = `
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:#0b3d5c;color:#fff;padding:11px 22px;border-radius:10px;
+    font-weight:700;font-size:13.5px;z-index:2000;
+    box-shadow:0 8px 24px rgba(0,0,0,.4);opacity:0;
+    transition:opacity .3s, transform .3s;pointer-events:none;
+    max-width:90vw;text-align:center;
+  `;
+  document.body.appendChild(t);
+  requestAnimationFrame(() => {
+    t.style.opacity = '1';
+    t.style.transform = 'translateX(-50%) translateY(0)';
+  });
+  setTimeout(() => {
+    t.style.opacity = '0';
+    t.style.transform = 'translateX(-50%) translateY(20px)';
+    setTimeout(() => t.remove(), 350);
+  }, duration);
+}
 
 function buildFileName(){
   const d = new Date();
@@ -379,28 +390,24 @@ async function cardToBlob(){
 function downloadBlob(blob, fileName){
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url;
-  a.download = fileName;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
+  a.href = url; a.download = fileName;
+  document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 4000);
 }
 
 /* ================= الأرشيف ================= */
 const ARCHIVE_KEY = 'al_tuba_archive';
-const archiveModal  = document.getElementById('archiveModal');
-const archiveList   = document.getElementById('archiveList');
-const archiveSearch = document.getElementById('archiveSearch');
-const archiveCount  = document.getElementById('archiveCount');
+const archiveModal     = document.getElementById('archiveModal');
+const archiveList      = document.getElementById('archiveList');
+const archiveSearch    = document.getElementById('archiveSearch');
+const archiveDateFilter= document.getElementById('archiveDateFilter');
+const archiveCount     = document.getElementById('archiveCount');
 
 function getArchive(){
   try { return JSON.parse(localStorage.getItem(ARCHIVE_KEY) || '[]'); }
   catch { return []; }
 }
-function setArchive(arr){
-  localStorage.setItem(ARCHIVE_KEY, JSON.stringify(arr));
-}
+function setArchive(arr){ localStorage.setItem(ARCHIVE_KEY, JSON.stringify(arr)); }
 
 function formatISODate(iso){
   if (!iso) return '—';
@@ -423,11 +430,10 @@ function saveToArchive(){
   const cumTankers = document.getElementById('cumTankers').value;
   const cumBarrels = document.getElementById('cumBarrels').value;
 
-  if (!date && !tankers && !barrels && !cumTankers && !cumBarrels) return;
+  if (!date && !tankers && !barrels && !cumTankers && !cumBarrels) return false;
 
   const archive = getArchive();
 
-  /* تجاهل التكرار المطابق لآخر سجل */
   if (archive.length > 0){
     const last = archive[0];
     if (last.date === date &&
@@ -435,7 +441,7 @@ function saveToArchive(){
         last.barrels === barrels &&
         last.cumTankers === cumTankers &&
         last.cumBarrels === cumBarrels){
-      return;
+      return false;
     }
   }
 
@@ -448,29 +454,35 @@ function saveToArchive(){
     tankers, barrels, cumTankers, cumBarrels
   });
   setArchive(archive);
+  return true;
 }
 
-function renderArchive(filter = ''){
-  const archive = getArchive();
-  let filtered = archive;
+function renderArchive(){
+  const textFilter = archiveSearch.value.trim().toLowerCase();
+  const dateFilter = archiveDateFilter.value;
 
-  if (filter.trim()){
-    const f = filter.trim().toLowerCase();
-    filtered = archive.filter(e =>
-      String(e.date || '').toLowerCase().includes(f) ||
-      String(e.savedAt || '').toLowerCase().includes(f) ||
-      String(e.tankers || '').includes(f) ||
-      String(e.barrels || '').includes(f) ||
-      String(e.cumTankers || '').includes(f) ||
-      String(e.cumBarrels || '').includes(f) ||
-      formatISODate(e.date).includes(f)
+  let filtered = getArchive();
+
+  if (dateFilter){
+    filtered = filtered.filter(e => e.date === dateFilter);
+  }
+
+  if (textFilter){
+    filtered = filtered.filter(e =>
+      String(e.date || '').toLowerCase().includes(textFilter) ||
+      String(e.savedAt || '').toLowerCase().includes(textFilter) ||
+      formatISODate(e.date).includes(textFilter) ||
+      String(e.tankers || '').includes(textFilter) ||
+      String(e.barrels || '').includes(textFilter) ||
+      String(e.cumTankers || '').includes(textFilter) ||
+      String(e.cumBarrels || '').includes(textFilter)
     );
   }
 
   archiveCount.textContent = `إجمالي السجلات: ${filtered.length}`;
 
   if (filtered.length === 0){
-    archiveList.innerHTML = '<div class="empty">لا توجد سجلات</div>';
+    archiveList.innerHTML = '<div class="empty">لا توجد سجلات مطابقة</div>';
     return;
   }
 
@@ -495,14 +507,65 @@ function renderArchive(filter = ''){
   });
 }
 
-function deleteEntry(id){
-  if (!confirm('حذف هذا السجل؟')) return;
-  setArchive(getArchive().filter(e => e.id !== id));
-  renderArchive(archiveSearch.value);
+/* ================= كلمة المرور (مخفية) ================= */
+const DELETE_PASSWORD = '2291977';
+let passwordCallback = null;
+
+const passwordModal  = document.getElementById('passwordModal');
+const passwordInput  = document.getElementById('passwordInput');
+const passwordError  = document.getElementById('passwordError');
+
+function requirePassword(callback){
+  passwordCallback = callback;
+  passwordInput.value = '';
+  passwordError.style.display = 'none';
+  passwordModal.classList.add('show');
+  setTimeout(() => passwordInput.focus(), 120);
 }
 
+function closePasswordModal(){
+  passwordModal.classList.remove('show');
+  passwordCallback = null;
+  passwordInput.value = '';
+  passwordError.style.display = 'none';
+}
+
+document.getElementById('confirmPassword').addEventListener('click', () => {
+  if (passwordInput.value === DELETE_PASSWORD){
+    const cb = passwordCallback;
+    closePasswordModal();
+    if (cb) cb();
+  } else {
+    passwordError.style.display = 'block';
+    passwordInput.value = '';
+    passwordInput.focus();
+  }
+});
+
+document.getElementById('cancelPassword').addEventListener('click', closePasswordModal);
+document.getElementById('closePassword').addEventListener('click', closePasswordModal);
+
+passwordInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('confirmPassword').click();
+});
+
+passwordModal.addEventListener('click', e => {
+  if (e.target === passwordModal) closePasswordModal();
+});
+
+/* حذف سجل — يتطلب كلمة المرور */
+function deleteEntry(id){
+  requirePassword(() => {
+    setArchive(getArchive().filter(e => e.id !== id));
+    renderArchive();
+    showToast('✓ تم حذف السجل');
+  });
+}
+
+/* ================= فتح/إغلاق الأرشيف ================= */
 function openArchive(){
   archiveSearch.value = '';
+  archiveDateFilter.value = '';
   renderArchive();
   archiveModal.classList.add('show');
 }
@@ -510,55 +573,79 @@ function closeArchive(){
   archiveModal.classList.remove('show');
 }
 
-/* تصدير Excel */
-function exportToExcel(){
+document.getElementById('btnArchive').addEventListener('click', openArchive);
+document.getElementById('closeArchive').addEventListener('click', closeArchive);
+archiveModal.addEventListener('click', e => {
+  if (e.target === archiveModal) closeArchive();
+});
+
+archiveSearch.addEventListener('input', renderArchive);
+archiveDateFilter.addEventListener('change', renderArchive);
+
+document.getElementById('btnResetFilter').addEventListener('click', () => {
+  archiveSearch.value = '';
+  archiveDateFilter.value = '';
+  renderArchive();
+});
+
+/* حذف الكل — يتطلب كلمة المرور */
+document.getElementById('btnClearArchive').addEventListener('click', () => {
+  requirePassword(() => {
+    setArchive([]);
+    renderArchive();
+    showToast('✓ تم حذف كل السجلات');
+  });
+});
+
+/* ================= تصدير Excel ================= */
+function exportToExcel(silent = false){
   const archive = getArchive();
   if (archive.length === 0){
-    alert('الأرشيف فارغ، لا يوجد ما يُصدَّر.');
-    return;
+    if (!silent) alert('الأرشيف فارغ، لا يوجد ما يُصدَّر.');
+    return false;
   }
   if (typeof XLSX === 'undefined'){
-    alert('تعذّر تحميل مكتبة Excel، تحقق من اتصال الإنترنت.');
-    return;
+    if (!silent) alert('تعذّر تحميل مكتبة Excel، تحقق من اتصال الإنترنت.');
+    return false;
   }
 
   const rows = archive.map(e => ({
-    'التاريخ'                : formatISODate(e.date),
-    'وقت الحفظ'              : e.savedAt || '',
-    'عدد الصهاريج (يوم)'     : e.tankers || '',
-    'الكمية بالبرميل (يوم)'  : e.barrels || '',
-    'العدد التراكمي للصهاريج': e.cumTankers || '',
-    'الكمية التراكمية بالبرميل': e.cumBarrels || ''
+    'التاريخ'                   : formatISODate(e.date),
+    'وقت الحفظ'                 : e.savedAt || '',
+    'عدد الصهاريج (يوم)'        : e.tankers || '',
+    'الكمية بالبرميل (يوم)'     : e.barrels || '',
+    'العدد التراكمي للصهاريج'   : e.cumTankers || '',
+    'الكمية التراكمية بالبرميل' : e.cumBarrels || ''
   }));
 
   const ws = XLSX.utils.json_to_sheet(rows);
-  ws['!cols'] = [
-    {wch:14},{wch:20},{wch:22},{wch:26},{wch:28},{wch:30}
-  ];
+  ws['!cols'] = [{wch:14},{wch:20},{wch:22},{wch:26},{wch:28},{wch:30}];
   try { ws['!views'] = [{ RTL: true }]; } catch(_){}
 
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'الأرشيف');
   XLSX.writeFile(wb, 'ارشيف الصهاريج.xlsx');
+  return true;
 }
 
-/* ربط أزرار الأرشيف */
-document.getElementById('btnArchive').addEventListener('click', openArchive);
-document.getElementById('closeArchive').addEventListener('click', closeArchive);
-document.getElementById('btnExportExcel').addEventListener('click', exportToExcel);
-document.getElementById('btnClearArchive').addEventListener('click', () => {
-  if (!confirm('حذف جميع سجلات الأرشيف نهائياً؟')) return;
-  setArchive([]);
-  renderArchive();
+document.getElementById('btnExportExcel').addEventListener('click', () => {
+  if (exportToExcel(false)) showToast('✓ تم تصدير ملف Excel');
 });
-archiveSearch.addEventListener('input', e => renderArchive(e.target.value));
-archiveModal.addEventListener('click', e => {
-  if (e.target === archiveModal) closeArchive();
-});
+
+/* حفظ Excel تلقائي بعد إضافة سجل */
+function autoSaveExcel(){
+  if (getArchive().length === 0) return;
+  setTimeout(() => {
+    try {
+      if (exportToExcel(true)) showToast('✓ تم حفظ ملف Excel تلقائياً');
+    } catch(e){ console.log('فشل الحفظ التلقائي:', e); }
+  }, 150);
+}
 
 /* ================= إرسال الصورة فقط عبر واتساب ================= */
 btnWa.addEventListener('click', async () => {
-  saveToArchive();                        /* ← حفظ تلقائي */
+  saveToArchive();          /* ← حفظ تلقائي في الأرشيف */
+  autoSaveExcel();          /* ← حفظ Excel تلقائياً */
 
   const oldText = btnWa.textContent;
   btnWa.disabled = true;
@@ -581,7 +668,7 @@ btnWa.addEventListener('click', async () => {
           btnWa.textContent = oldText;
           return;
         }
-        console.log('المشاركة فشلت، سيتم الحفظ كحل احتياطي:', err);
+        console.log('المشاركة فشلت:', err);
       }
     }
 
@@ -605,7 +692,8 @@ btnWa.addEventListener('click', async () => {
 
 /* ================= حفظ صورة ================= */
 btnSave.addEventListener('click', async () => {
-  saveToArchive();                        /* ← حفظ تلقائي */
+  saveToArchive();          /* ← حفظ تلقائي في الأرشيف */
+  autoSaveExcel();          /* ← حفظ Excel تلقائياً */
 
   const oldText = btnSave.textContent;
   btnSave.disabled = true;
@@ -622,13 +710,15 @@ btnSave.addEventListener('click', async () => {
   }
 });
 
-/* ================= مسح النموذج ================= */
+/* ================= مسح النموذج (يتطلب كلمة المرور) ================= */
 btnClear.addEventListener('click', () => {
-  if (!confirm('هل تريد مسح جميع الحقول؟')) return;
-  ['dateInput','tankers','barrels','cumTankers','cumBarrels'].forEach(id => {
-    document.getElementById(id).value = '';
+  requirePassword(() => {
+    ['dateInput','tankers','barrels','cumTankers','cumBarrels'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('dateInput').focus();
+    showToast('✓ تم مسح النموذج');
   });
-  document.getElementById('dateInput').focus();
 });
 
 /* ================= Service Worker ================= */
@@ -636,7 +726,7 @@ if ('serviceWorker' in navigator){
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js')
       .then(() => console.log('Service Worker جاهز ✓'))
-      .catch(err => console.log('فشل تسجيل Service Worker:', err));
+      .catch(err => console.log('فشل تسجيل SW:', err));
   });
 }
 </script>
