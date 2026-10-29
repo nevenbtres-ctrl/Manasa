@@ -10,13 +10,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Al-Tuba">
 
-<!-- رابط ملف المانيفست (للتثبيت) -->
 <link rel="manifest" href="manifest.json">
-
-<!-- أيقونة آيفون -->
 <link rel="apple-touch-icon" href="https://placehold.co/180x180/0b3d5c/ffffff?text=Al-Tuba">
 
-<!-- مكتبة تحويل البطاقة إلى صورة -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <style>
@@ -89,14 +85,11 @@
 
   .lbl{font-size:14px;font-weight:600;color:#33506b;white-space:nowrap}
 
-  .val{
-    font-size:15px;font-weight:800;color:#0b3d5c;
-    direction:ltr;font-variant-numeric:tabular-nums;
-  }
-
   .sep{height:1px;background:#e6edf3;margin:8px 0}
 
-  input[type=number]{
+  /* الحقول (رقم + تاريخ) بتنسيق موحد */
+  input[type=number],
+  input[type=date]{
     width:150px;flex:0 0 auto;
     padding:7px 10px;
     font-family:inherit;font-size:15px;font-weight:800;
@@ -106,13 +99,16 @@
     outline:none;
     transition:border-color .15s, box-shadow .15s, background .15s;
   }
-  input[type=number]:focus{
+  input[type=number]:focus,
+  input[type=date]:focus{
     background:#fff;border-color:#14719c;
     box-shadow:0 0 0 3px rgba(20,113,156,.15);
   }
   input[type=number]::-webkit-outer-spin-button,
   input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
   input[type=number]{-moz-appearance:textfield;appearance:textfield}
+
+  input[type=date]{font-size:14px;font-weight:700}
 
   .foot{
     text-align:center;font-size:12px;font-weight:600;letter-spacing:.4px;
@@ -159,7 +155,8 @@
 
   @media (max-width:420px){
     .lbl{font-size:12.5px;white-space:normal}
-    input[type=number]{width:128px;font-size:14px}
+    input[type=number],
+    input[type=date]{width:128px;font-size:14px}
     .head h1{font-size:19px}
   }
 </style>
@@ -167,7 +164,6 @@
 
 <body>
 
-  <!-- ===== البطاقة (تُحوَّل إلى صورة) ===== -->
   <div class="card" id="card">
 
     <div class="head">
@@ -179,35 +175,34 @@
 
       <div class="site">موقع شمعات تحميل (مستودع الطوبة)</div>
 
+      <!-- التاريخ (إدخال يدوي) -->
       <div class="row">
-        <span class="lbl">التاريخ</span>
-        <span class="val" id="dateVal">--/--/----</span>
-      </div>
-      <div class="row">
-        <span class="lbl">الوقت</span>
-        <span class="val" id="timeVal">--:--:--</span>
+        <label class="lbl" for="dateInput">التاريخ</label>
+        <input id="dateInput" type="date">
       </div>
 
       <div class="sep"></div>
 
+      <!-- عدد الصهاريج (يوم) -->
       <div class="row">
-        <label class="lbl" for="tankers">عدد الصهاريج</label>
-        <input id="tankers" type="number" step="any" inputmode="decimal" value="165">
+        <label class="lbl" for="tankers">عدد الصهاريج (يوم)</label>
+        <input id="tankers" type="number" step="any" inputmode="decimal">
       </div>
 
+      <!-- الكمية بالبرميل (يوم) -->
       <div class="row">
-        <label class="lbl" for="barrels">الكمية بالبرميل</label>
-        <input id="barrels" type="number" step="any" inputmode="decimal" value="36500.088">
+        <label class="lbl" for="barrels">الكمية بالبرميل (يوم)</label>
+        <input id="barrels" type="number" step="any" inputmode="decimal">
       </div>
 
       <div class="row">
         <label class="lbl" for="cumTankers">العدد التراكمي للصهاريج</label>
-        <input id="cumTankers" type="number" step="any" inputmode="decimal" value="1136">
+        <input id="cumTankers" type="number" step="any" inputmode="decimal">
       </div>
 
       <div class="row">
         <label class="lbl" for="cumBarrels">الكمية التراكمية بالبرميل</label>
-        <input id="cumBarrels" type="number" step="any" inputmode="decimal" value="251429.228">
+        <input id="cumBarrels" type="number" step="any" inputmode="decimal">
       </div>
 
     </div>
@@ -215,7 +210,6 @@
     <div class="foot">Programming by Osama Abdul-Abbad</div>
   </div>
 
-  <!-- ===== الأزرار ===== -->
   <div class="btns">
     <button class="btn wa"    id="btnWa">إرسال الصورة عبر واتساب</button>
     <button class="btn save"  id="btnSave">حفظ صورة</button>
@@ -225,23 +219,8 @@
   <div id="overlay"><div class="box"><span class="spin"></span><span id="ovText">جاري تحضير الصورة...</span></div></div>
 
 <script>
-/* ================= التاريخ والوقت التلقائي ================= */
-const dateEl = document.getElementById('dateVal');
-const timeEl = document.getElementById('timeVal');
 const pad = n => String(n).padStart(2, '0');
 
-function updateClock(){
-  const d = new Date();
-  dateEl.textContent = `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`;
-  let h = d.getHours();
-  const suffix = h >= 12 ? 'م' : 'ص';
-  h = h % 12 || 12;
-  timeEl.textContent = `${pad(h)}:${pad(d.getMinutes())}:${pad(d.getSeconds())} ${suffix}`;
-}
-updateClock();
-setInterval(updateClock, 1000);
-
-/* ================= أدوات مساعدة ================= */
 const overlay  = document.getElementById('overlay');
 const ovText   = document.getElementById('ovText');
 const cardEl   = document.getElementById('card');
@@ -283,7 +262,7 @@ function downloadBlob(blob, fileName){
   setTimeout(() => URL.revokeObjectURL(url), 4000);
 }
 
-/* ================= إرسال الصورة فقط عبر واتساب (بدون أي نص) ================= */
+/* ===== إرسال الصورة فقط عبر واتساب (بدون نص) ===== */
 btnWa.addEventListener('click', async () => {
   const oldText = btnWa.textContent;
   btnWa.disabled = true;
@@ -294,7 +273,6 @@ btnWa.addEventListener('click', async () => {
     const fileName = buildFileName();
     const file     = new File([blob], fileName, { type: 'image/png' });
 
-    /* مشاركة ملف الصورة فقط — بدون text ولا title */
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       try {
         await navigator.share({ files: [file] });
@@ -313,7 +291,6 @@ btnWa.addEventListener('click', async () => {
       }
     }
 
-    /* الحل الاحتياطي (حاسب) — حفظ الصورة فقط */
     hideOverlay();
     downloadBlob(blob, fileName);
     btnWa.disabled = false;
@@ -333,7 +310,7 @@ btnWa.addEventListener('click', async () => {
   }
 });
 
-/* ================= حفظ صورة فقط ================= */
+/* ===== حفظ صورة ===== */
 btnSave.addEventListener('click', async () => {
   const oldText = btnSave.textContent;
   btnSave.disabled = true;
@@ -350,16 +327,16 @@ btnSave.addEventListener('click', async () => {
   }
 });
 
-/* ================= مسح ================= */
+/* ===== مسح ===== */
 btnClear.addEventListener('click', () => {
-  if (!confirm('هل تريد مسح جميع الأرقام؟')) return;
-  ['tankers','barrels','cumTankers','cumBarrels'].forEach(id => {
+  if (!confirm('هل تريد مسح جميع الحقول؟')) return;
+  ['dateInput','tankers','barrels','cumTankers','cumBarrels'].forEach(id => {
     document.getElementById(id).value = '';
   });
-  document.getElementById('tankers').focus();
+  document.getElementById('dateInput').focus();
 });
 
-/* ================= تسجيل Service Worker (PWA) ================= */
+/* ===== Service Worker ===== */
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js')
