@@ -155,7 +155,7 @@
   .btn.excel{background:linear-gradient(135deg,#1e8e3e,#0d652d)}
   .btn.trash{background:linear-gradient(135deg,#ef4444,#b91c1c)}
   .btn.reset{background:linear-gradient(135deg,#94a3b8,#64748b);padding:9px 12px;font-size:12px}
-  .btn.migrate{background:linear-gradient(135deg,#3b82f6,#2563eb);padding:9px 14px;font-size:13px;border-radius:9px; display:none;}
+  .btn.migrate{background:linear-gradient(135deg,#3b82f6,#2563eb);padding:9px 14px;font-size:13px;border-radius:9px;}
 
   .modal-body{padding:12px;overflow-y:auto;flex:1}
 
@@ -271,8 +271,8 @@
         <input type="text" id="archiveSearch" placeholder="🔍 بحث بالتاريخ أو الرقم...">
         <input type="date" id="archiveDateFilter">
         <button class="btn reset" id="btnResetFilter">🔄 الكل</button>
-        <!-- زر الترحيل يظهر هنا -->
-        <button class="btn migrate" id="btnMigrate">☁️ ترحيل للسحابة</button>
+        <!-- زر الترحيل أصبح ظاهراً دائماً -->
+        <button class="btn migrate" id="btnMigrate">☁️ ترحيل السجلات القديمة</button>
         <button class="btn excel" id="btnExportExcel">📊 Excel</button>
         <button class="btn trash" id="btnClearArchive">🗑️ حذف الكل</button>
       </div>
@@ -321,7 +321,7 @@
 
 <script>
 /* =========================================================
-   ⚙️ إعداد Firebase الخاص بك (تم وضعه بناءً على صورتك)
+   ⚙️ إعداد Firebase الخاص بك
    ========================================================= */
 const firebaseConfig = {
   apiKey: "AIzaSyA6etxglLiUfiUDRPT7jigoCJtbAPwzWmnw",
@@ -333,7 +333,6 @@ const firebaseConfig = {
   measurementId: "G-36P5JTVYZM"
 };
 
-/* ========== تهيئة Firebase ========== */
 const USE_CLOUD = true;
 let db = null;
 const archiveRef = () => db.collection('archive');
@@ -439,7 +438,7 @@ function updateSyncStatus(state){
   if (state === 'local')   syncStatus.textContent = '💾 محلي فقط';
 }
 
-/* ========== طبقة البيانات الموحدة ========== */
+/* ========== طبقة البيانات ========== */
 async function initArchive(){
   updateSyncStatus('loading');
   archiveRef().orderBy('id', 'desc').onSnapshot(snapshot => {
@@ -447,7 +446,6 @@ async function initArchive(){
     archiveLoaded = true;
     updateSyncStatus('online');
     if (archiveModal.classList.contains('show')) renderArchive();
-    checkMigrationStatus(); // فحص وجود سجلات محلية
   }, err => {
     console.error('Snapshot error:', err);
     updateSyncStatus('offline');
@@ -470,7 +468,7 @@ async function clearAllArchive(){
   await batch.commit();
 }
 
-/* ========== حفظ تلقائي في الأرشيف ========== */
+/* ========== حفظ تلقائي ========== */
 async function saveToArchive(){
   const date       = document.getElementById('dateInput').value;
   const tankers    = document.getElementById('tankers').value;
@@ -503,7 +501,6 @@ async function saveToArchive(){
   } catch(e) {
     console.error('Save failed:', e);
     showToast('❌ فشل الاتصال بالسحابة، تم الحفظ محلياً فقط');
-    // احتياطي: حفظ محلي
     const local = JSON.parse(localStorage.getItem(ARCHIVE_KEY) || '[]');
     local.unshift(record);
     localStorage.setItem(ARCHIVE_KEY, JSON.stringify(local));
@@ -511,42 +508,35 @@ async function saveToArchive(){
   }
 }
 
-/* ========== نظام الترحيل (Migration) ========== */
-function checkMigrationStatus(){
-  if (!USE_CLOUD) return;
-  const localData = JSON.parse(localStorage.getItem(ARCHIVE_KEY) || '[]');
-  if (localData.length > 0) {
-    btnMigrate.style.display = 'inline-block';
-    btnMigrate.textContent = `☁️ ترحيل (${localData.length}) للسحابة`;
-  } else {
-    btnMigrate.style.display = 'none';
-  }
-}
-
+/* ========== زر الترحيل (Migration) ========== */
 btnMigrate.addEventListener('click', async () => {
   const localData = JSON.parse(localStorage.getItem(ARCHIVE_KEY) || '[]');
-  if (localData.length === 0) return;
+  
+  if (localData.length === 0) {
+    alert('لا توجد سجلات قديمة في هذا الجهاز لترحيلها.\n\nملاحظة: السجلات القديمة تكون محفوظة فقط على الجهاز الذي أدخلتها عليه قبل ربط السحابة.');
+    return;
+  }
 
-  if (!confirm(`هل أنت متأكد من ترحيل ${localData.length} سجل قديم إلى السحابة؟ سيتم مسحها من الذاكرة المحلية لتجنب التكرار.`)) return;
+  if (!confirm(`هل أنت متأكد من ترحيل ${localData.length} سجل قديم إلى السحابة؟\nسيتم مسحها من الذاكرة المحلية لتجنب التكرار.`)) return;
 
   const oldText = btnMigrate.textContent;
   btnMigrate.textContent = '⏳ جاري الترحيل...';
   btnMigrate.disabled = true;
 
   try {
-    // استخدام دفعات (Batches) لتجنب الحد الأقصى (500 سجل لكل دفعة)
     for (let i = 0; i < localData.length; i += 500) {
       const batch = db.batch();
       const chunk = localData.slice(i, i + 500);
       chunk.forEach(record => {
-        const docRef = archiveRef().doc(); // إنشاء معرف جديد
+        const docRef = archiveRef().doc(); 
         batch.set(docRef, record);
       });
       await batch.commit();
     }
 
-    localStorage.removeItem(ARCHIVE_KEY); // مسح المحلي بعد النجاح
-    btnMigrate.style.display = 'none';
+    localStorage.removeItem(ARCHIVE_KEY);
+    btnMigrate.textContent = oldText;
+    btnMigrate.disabled = false;
     showToast(`✓ تم ترحيل ${localData.length} سجل بنجاح!`);
   } catch (error) {
     console.error('Migration failed:', error);
@@ -667,7 +657,6 @@ function openArchive(){
   archiveSearch.value = '';
   archiveDateFilter.value = '';
   archiveModal.classList.add('show');
-  checkMigrationStatus();
   renderArchive();
 }
 function closeArchive(){ archiveModal.classList.remove('show'); }
