@@ -11,22 +11,19 @@
 <meta name="apple-mobile-web-app-title" content="Al-Tuba">
 
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="https://placehold.co/180x180/0b3d5c/ffffff?text=Al-Tuba">
+<link rel="apple-touch-icon" href="icon-192.png">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
-<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
-
   body{
     min-height:100vh;display:flex;flex-direction:column;
-    align-items:center;justify-content:center;gap:18px;
-    padding:24px 16px calc(24px + env(safe-area-inset-bottom));
+    align-items:center;justify-content:center;gap:14px;
+    padding:20px 16px calc(20px + env(safe-area-inset-bottom));
     font-family:"Segoe UI", Tahoma, Arial, sans-serif;
     background:radial-gradient(circle at 20% 10%, #1b4b68, #0a1c28 65%);
     color:#0f172a;
@@ -35,39 +32,64 @@
   .card{
     width:100%;max-width:470px;background:#fff;border-radius:18px;
     overflow:hidden;box-shadow:0 18px 45px rgba(0,0,0,.45);
+    position:relative;
   }
 
   .head{
-    position:relative;padding:20px 18px 16px;text-align:center;color:#fff;
+    position:relative;padding:16px 18px 14px;text-align:center;color:#fff;
     background:linear-gradient(135deg,#0b3d5c 0%,#14719c 100%);
+    display: flex; flex-direction: column; align-items: center;
   }
   .head::after{
     content:"";position:absolute;bottom:0;left:50%;
     transform:translateX(-50%);width:90px;height:4px;
     border-radius:4px 4px 0 0;background:#f0b429;
   }
-  .head h1{font-size:22px;font-weight:800;letter-spacing:.6px}
-  .head h2{margin-top:6px;font-size:13px;font-weight:500;letter-spacing:.5px;opacity:.88}
+  
+  /* تنسيق الشعار */
+  .logo-img {
+    width: 80px; height: 80px; object-fit: contain; 
+    margin-bottom: 10px; border-radius: 50%; /* شكل دائري احترافي */
+    background: #fff; padding: 4px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+    display: inline-block;
+  }
 
-  .body{padding:16px 18px 10px}
+  .head h1{font-size:21px;font-weight:800;letter-spacing:.6px}
+  .head h2{margin-top:4px;font-size:12px;font-weight:500;letter-spacing:.5px;opacity:.88}
+
+  /* التبويبات */
+  .tabs{
+    display:flex;background:#eef6fb;border-bottom:1px solid #cfe4f0;
+  }
+  .tab-btn{
+    flex:1;padding:12px;border:0;background:transparent;
+    font-family:inherit;font-size:14px;font-weight:700;color:#5b7a92;
+    cursor:pointer;transition:all .2s;
+    border-bottom:3px solid transparent;
+  }
+  .tab-btn.active{
+    color:#0b3d5c;border-bottom-color:#14719c;background:#fff;
+  }
+
+  .body{padding:14px 18px 10px}
 
   .site{
-    text-align:center;background:#eef6fb;border:1px solid #cfe4f0;
-    color:#0b3d5c;font-weight:700;font-size:14px;
-    border-radius:10px;padding:9px 10px;margin-bottom:14px;
+    text-align:center;background:#f8fbfd;border:1px solid #cfe4f0;
+    color:#0b3d5c;font-weight:700;font-size:13px;
+    border-radius:10px;padding:8px 10px;margin-bottom:12px;
   }
 
   .row{
     display:flex;align-items:center;justify-content:space-between;
-    gap:12px;padding:8px 0;border-bottom:1px dashed #e6edf3;
+    gap:12px;padding:6px 0;border-bottom:1px dashed #e6edf3;
   }
   .row:last-child{border-bottom:0}
 
-  .lbl{font-size:14px;font-weight:600;color:#33506b;white-space:nowrap}
-  .sep{height:1px;background:#e6edf3;margin:8px 0}
-
-  input[type=number],input[type=date]{
-    width:150px;flex:0 0 auto;padding:7px 10px;
+  .lbl{font-size:13.5px;font-weight:600;color:#33506b;white-space:nowrap}
+  
+  input[type=number],input[type=date],.readonly-val{
+    width:145px;flex:0 0 auto;padding:7px 10px;
     font-family:inherit;font-size:15px;font-weight:800;
     text-align:center;direction:ltr;
     color:#0b3d5c;background:#f8fbfd;
@@ -81,18 +103,31 @@
   input[type=number]::-webkit-outer-spin-button,
   input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
   input[type=number]{-moz-appearance:textfield;appearance:textfield}
-  input[type=date]{font-size:14px;font-weight:700}
+  input[type=date]{font-size:13.5px;font-weight:700}
+
+  .readonly-val{
+    background:#e2e8f0;color:#475569;border-color:#cbd5e1;
+    display:flex;align-items:center;justify-content:center;
+    min-height:36px;
+  }
+
+  .note-box{
+    background:#fffbeb;border:1px solid #fde68a;color:#92400e;
+    padding:8px 10px;border-radius:8px;font-size:11.5px;font-weight:600;
+    text-align:center;margin-top:12px;
+  }
 
   .foot{
     text-align:center;font-size:12px;font-weight:600;letter-spacing:.4px;
     padding:12px;color:#5b7a92;background:#f4f8fb;border-top:1px solid #e3edf4;
   }
 
-  .btns{width:100%;max-width:470px;display:flex;flex-wrap:wrap;gap:10px}
+  .btns{width:100%;max-width:470px;display:flex;flex-wrap:wrap;gap:8px}
   .btn{
-    flex:1 1 130px;border:0;border-radius:12px;padding:13px 10px;
-    font-family:inherit;font-size:14px;font-weight:700;color:#fff;
+    flex:1 1 120px;border:0;border-radius:12px;padding:12px 8px;
+    font-family:inherit;font-size:13.5px;font-weight:700;color:#fff;
     cursor:pointer;transition:transform .15s, filter .15s;
+    display:flex;align-items:center;justify-content:center;gap:6px;
   }
   .btn:hover{filter:brightness(1.08)}
   .btn:active{transform:scale(.97)}
@@ -100,8 +135,24 @@
   .btn.wa     {background:linear-gradient(135deg,#25d366,#128c7e)}
   .btn.save   {background:linear-gradient(135deg,#2b7fb8,#0b3d5c)}
   .btn.archive{background:linear-gradient(135deg,#8b5cf6,#6d28d9)}
+  .btn.info   {background:linear-gradient(135deg,#f59e0b,#d97706)}
   .btn.clear  {background:linear-gradient(135deg,#ef4444,#b91c1c)}
+  
+  .btn.update-balance {
+    flex:1; background:linear-gradient(135deg,#10b981,#059669);
+    margin-top:4px; padding:10px; font-size:12px;
+  }
+  .btn.fix-balance {
+    flex:1; background:linear-gradient(135deg,#3b82f6,#2563eb);
+    margin-top:4px; padding:10px; font-size:12px;
+  }
+  .btn.reset-balance {
+    background:linear-gradient(135deg,#94a3b8,#64748b);
+    margin-top:6px; padding:8px; font-size:11.5px;
+    flex:1 1 100%;
+  }
 
+  /* النوافذ المنبثقة */
   .modal{
     display:none;position:fixed;inset:0;
     background:rgba(6,20,30,.75);z-index:1000;
@@ -118,14 +169,14 @@
     padding:14px 18px;background:linear-gradient(135deg,#0b3d5c,#14719c);
     color:#fff;display:flex;justify-content:space-between;align-items:center;gap:10px;
   }
-  .modal-header h2{font-size:17px;font-weight:800}
+  .modal-header h2{font-size:16px;font-weight:800}
   .close-btn{
     background:transparent;border:0;color:#fff;font-size:26px;
     line-height:1;cursor:pointer;padding:0 4px;
   }
 
   .sync-indicator{
-    font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;
+    font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;
     background:rgba(255,255,255,.2);
   }
   .sync-indicator.online{background:#10b981}
@@ -135,44 +186,37 @@
   .modal-toolbar{
     padding:10px 12px;background:#f4f8fb;
     border-bottom:1px solid #e3edf4;
-    display:flex;gap:8px;flex-wrap:wrap;align-items:center;
+    display:flex;gap:6px;flex-wrap:wrap;align-items:center;
   }
   .modal-toolbar input{
-    flex:1 1 140px;padding:9px 12px;
-    border:1px solid #cbdce8;border-radius:9px;
-    font-family:inherit;font-size:14px;background:#fff;outline:none;
+    flex:1 1 120px;padding:8px 10px;border:1px solid #cbdce8;
+    border-radius:8px;font-family:inherit;font-size:13px;outline:none;
   }
-  .modal-toolbar input:focus{
-    border-color:#14719c;
-    box-shadow:0 0 0 3px rgba(20,113,156,.15);
-  }
-  .modal-toolbar input[type=date]{
-    flex:0 0 145px;font-size:13px;direction:ltr;min-height:38px;
-  }
-  .modal-toolbar .btn{
-    flex:0 0 auto;padding:9px 14px;font-size:13px;border-radius:9px;
-  }
+  .modal-toolbar input[type=date]{flex:0 0 130px;font-size:12px;direction:ltr;min-height:34px}
+  .modal-toolbar .btn{flex:0 0 auto;padding:8px 10px;font-size:11.5px;border-radius:8px}
+  
   .btn.excel{background:linear-gradient(135deg,#1e8e3e,#0d652d)}
   .btn.trash{background:linear-gradient(135deg,#ef4444,#b91c1c)}
-  .btn.reset{background:linear-gradient(135deg,#94a3b8,#64748b);padding:9px 12px;font-size:12px}
-  .btn.migrate{background:linear-gradient(135deg,#3b82f6,#2563eb);padding:9px 14px;font-size:13px;border-radius:9px;}
+  .btn.reset{background:linear-gradient(135deg,#94a3b8,#64748b)}
+  .btn.migrate{background:linear-gradient(135deg,#3b82f6,#2563eb)}
 
   .modal-body{padding:12px;overflow-y:auto;flex:1}
 
   .archive-count{
-    text-align:center;color:#5b7a92;
-    font-size:12px;font-weight:600;padding:4px 0 10px;
+    text-align:center;color:#5b7a92;font-size:11.5px;
+    font-weight:600;padding:4px 0 10px;
   }
 
   .archive-item{
     border:1px solid #cfe4f0;border-radius:10px;
-    padding:10px 12px;margin-bottom:8px;background:#f8fbfd;
+    padding:10px;margin-bottom:8px;background:#f8fbfd;
+    position:relative;
   }
   .archive-item-header{
     display:flex;justify-content:space-between;align-items:center;
-    padding-bottom:8px;margin-bottom:8px;
+    padding-bottom:6px;margin-bottom:6px;
     border-bottom:1px dashed #cfe4f0;
-    font-size:13px;font-weight:700;color:#0b3d5c;
+    font-size:12.5px;font-weight:700;color:#0b3d5c;
     gap:6px;flex-wrap:wrap;
   }
   .archive-item-header .del-btn{
@@ -181,38 +225,45 @@
   }
   .archive-item-header .del-btn:hover{opacity:1}
 
+  .badge{
+    font-size:9.5px;padding:2px 6px;border-radius:4px;color:#fff;
+  }
+  .badge.custom{background:#8b5cf6}
+  .badge.approved{background:#10b981}
+
   .archive-item-body{
     display:grid;grid-template-columns:1fr 1fr;
-    gap:6px 12px;font-size:13px;color:#33506b;
+    gap:4px 10px;font-size:12.5px;color:#33506b;
   }
   .archive-item-body b{color:#0b3d5c;font-weight:800;direction:ltr;display:inline-block}
+  .archive-item-body .full-width { grid-column: span 2; }
 
-  .empty{text-align:center;padding:30px 10px;color:#8ba3b8;font-weight:600;font-size:14px}
+  .empty{text-align:center;padding:30px 10px;color:#8ba3b8;font-weight:600;font-size:13px}
 
   #overlay{
     position:fixed;inset:0;background:rgba(6,20,30,.65);
     display:none;align-items:center;justify-content:center;
-    z-index:1200;color:#fff;font-weight:700;font-size:15px;
+    z-index:1200;color:#fff;font-weight:700;font-size:14px;
   }
   #overlay.show{display:flex}
   #overlay .box{
     background:#0b3d5c;border:1px solid #14719c;
-    padding:18px 26px;border-radius:14px;
-    display:flex;align-items:center;gap:12px;
+    padding:16px 24px;border-radius:14px;
+    display:flex;align-items:center;gap:10px;
   }
   .spin{
-    width:20px;height:20px;border-radius:50%;
+    width:18px;height:18px;border-radius:50%;
     border:3px solid rgba(255,255,255,.3);
-    border-top-color:#f0b429;
-    animation:sp .8s linear infinite;
+    border-top-color:#f0b429;animation:sp .8s linear infinite;
   }
   @keyframes sp{to{transform:rotate(360deg)}}
 
   @media (max-width:420px){
-    .lbl{font-size:12.5px;white-space:normal}
-    input[type=number],input[type=date]{width:128px;font-size:14px}
-    .head h1{font-size:19px}
+    .lbl{font-size:12px;white-space:normal}
+    input[type=number],input[type=date],.readonly-val{width:120px;font-size:13.5px;padding:6px 8px}
+    .head h1{font-size:18px}
     .archive-item-body{grid-template-columns:1fr}
+    .archive-item-body .full-width { grid-column: span 1; }
   }
 </style>
 </head>
@@ -221,45 +272,105 @@
 
   <div class="card" id="card">
     <div class="head">
+      <!-- هنا تم تعديل اسم الصورة ليكون icon-192.png -->
+      <img src="icon-192.png" alt="Tuba Logo" class="logo-img" onerror="this.style.display='none'">
       <h1>Al-Tuba Oil Depot</h1>
       <h2>Oil Tanker Loading Platforms</h2>
     </div>
 
+    <!-- التبويبات -->
+    <div class="tabs hide-capture">
+      <button class="tab-btn active" id="tabCustom" onclick="switchTab('custom')">التحميل المخصص</button>
+      <button class="tab-btn" id="tabApproved" onclick="switchTab('approved')">التحميل المعتمد</button>
+    </div>
+
     <div class="body">
       <div class="site">موقع شمعات تحميل (مستودع الطوبة)</div>
+
+      <!-- حقول مشتركة -->
       <div class="row">
         <label class="lbl" for="dateInput">التاريخ</label>
         <input id="dateInput" type="date">
       </div>
-      <div class="sep"></div>
-      <div class="row">
-        <label class="lbl" for="tankers">عدد الصهاريج (يوم)</label>
-        <input id="tankers" type="number" step="any" inputmode="decimal">
+
+      <!-- ================= التحميل المخصص ================= -->
+      <div id="formCustom">
+        <div class="row">
+          <label class="lbl" for="tankersCustom">عدد الصهاريج (يوم)</label>
+          <input id="tankersCustom" type="number" step="any" inputmode="decimal">
+        </div>
+        <div class="row">
+          <label class="lbl" for="barrelsCustom">الكمية بالبرميل (يوم)</label>
+          <input id="barrelsCustom" type="number" step="any" inputmode="decimal">
+        </div>
+        <div class="row">
+          <label class="lbl" for="cumTankersCustom">العدد التراكمي للصهاريج</label>
+          <input id="cumTankersCustom" type="number" step="any" inputmode="decimal">
+        </div>
+        <div class="row">
+          <label class="lbl" for="cumBarrelsCustom">الكمية التراكمية بالبرميل</label>
+          <input id="cumBarrelsCustom" type="number" step="any" inputmode="decimal">
+        </div>
       </div>
-      <div class="row">
-        <label class="lbl" for="barrels">الكمية بالبرميل (يوم)</label>
-        <input id="barrels" type="number" step="any" inputmode="decimal">
+
+      <!-- ================= التحميل المعتمد ================= -->
+      <div id="formApproved" style="display:none">
+        <div class="row">
+          <label class="lbl" for="prevCumTankers">الرصيد التراكمي السابق (صهاريج)</label>
+          <input id="prevCumTankers" type="number" step="any" inputmode="decimal" placeholder="0">
+        </div>
+        <div class="row">
+          <label class="lbl" for="prevCumBarrels">الرصيد التراكمي السابق (برميل)</label>
+          <input id="prevCumBarrels" type="number" step="any" inputmode="decimal" placeholder="0">
+        </div>
+        
+        <div style="height:1px;background:#e6edf3;margin:6px 0"></div>
+        
+        <div class="row">
+          <label class="lbl" for="tankersApproved">العدد المضاف اليوم (صهاريج)</label>
+          <input id="tankersApproved" type="number" step="any" inputmode="decimal">
+        </div>
+        <div class="row">
+          <label class="lbl" for="barrelsApproved">الكمية المضافة اليوم (برميل)</label>
+          <input id="barrelsApproved" type="number" step="any" inputmode="decimal">
+        </div>
+
+        <div style="height:1px;background:#e6edf3;margin:6px 0"></div>
+
+        <div class="row">
+          <span class="lbl" style="color:#0b3d5c">المجموع التراكمي الصافي (صهاريج)</span>
+          <div class="readonly-val" id="displayCumTankers">0</div>
+        </div>
+        <div class="row">
+          <span class="lbl" style="color:#0b3d5c">المجموع التراكمي الصافي (برميل)</span>
+          <div class="readonly-val" id="displayCumBarrels">0</div>
+        </div>
+
+        <!-- أزرار التحكم بالرصيد -->
+        <div style="display:flex; gap:6px; margin-top:6px" class="hide-capture">
+          <button class="btn update-balance" id="btnUpdateBalance" title="جمع (السابق + اليوم) وتثبيته كسابق">🔄 اعتماد الحالي</button>
+          <button class="btn fix-balance" id="btnSavePrevBalance" title="حفظ الأرقام المكتوبة في الرصيد السابق كما هي">📌 تثبيت المعدل</button>
+        </div>
+        <button class="btn reset-balance hide-capture" id="btnClearPrevBalance">🧹 تصفير الرصيد السابق</button>
       </div>
-      <div class="row">
-        <label class="lbl" for="cumTankers">العدد التراكمي للصهاريج</label>
-        <input id="cumTankers" type="number" step="any" inputmode="decimal">
-      </div>
-      <div class="row">
-        <label class="lbl" for="cumBarrels">الكمية التراكمية بالبرميل</label>
-        <input id="cumBarrels" type="number" step="any" inputmode="decimal">
-      </div>
+
+      <!-- ملاحظة الأرشفة -->
+      <div class="note-box hide-capture">⚠️ ملاحظة: عند الإرسال أو حفظ الصورة، سيتم أرشفة البيانات تلقائياً في السحابة.</div>
     </div>
 
     <div class="foot">Programming by Osama Abdul-Abbad</div>
   </div>
 
+  <!-- الأزرار الخارجية -->
   <div class="btns">
-    <button class="btn wa"      id="btnWa">إرسال الصورة عبر واتساب</button>
+    <button class="btn wa"      id="btnWa">واتساب</button>
     <button class="btn save"    id="btnSave">حفظ صورة</button>
     <button class="btn archive" id="btnArchive">الأرشيف</button>
-    <button class="btn clear"   id="btnClear">مسح</button>
+    <button class="btn info"    id="btnInfo">تعليمات</button>
+    <button class="btn clear"   id="btnClear">مسح النموذج</button>
   </div>
 
+  <!-- نافذة الأرشيف -->
   <div id="archiveModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -268,13 +379,12 @@
         <button class="close-btn" id="closeArchive">×</button>
       </div>
       <div class="modal-toolbar">
-        <input type="text" id="archiveSearch" placeholder="🔍 بحث بالتاريخ أو الرقم...">
+        <input type="text" id="archiveSearch" placeholder="🔍 بحث...">
         <input type="date" id="archiveDateFilter">
-        <button class="btn reset" id="btnResetFilter">🔄 الكل</button>
-        <!-- زر الترحيل أصبح ظاهراً دائماً -->
-        <button class="btn migrate" id="btnMigrate">☁️ ترحيل السجلات القديمة</button>
+        <button class="btn reset" id="btnResetFilter">🔄</button>
+        <button class="btn migrate" id="btnMigrate">☁️ ترحيل</button>
         <button class="btn excel" id="btnExportExcel">📊 Excel</button>
-        <button class="btn trash" id="btnClearArchive">🗑️ حذف الكل</button>
+        <button class="btn trash" id="btnClearArchive">🗑️ حذف</button>
       </div>
       <div class="modal-body">
         <div class="archive-count" id="archiveCount"></div>
@@ -283,6 +393,33 @@
     </div>
   </div>
 
+  <!-- نافذة التعليمات -->
+  <div id="infoModal" class="modal">
+    <div class="modal-content" style="max-width:400px">
+      <div class="modal-header">
+        <h2>📖 تعليمات الاستخدام</h2>
+        <button class="close-btn" onclick="document.getElementById('infoModal').classList.remove('show')">×</button>
+      </div>
+      <div class="modal-body" style="padding:16px; font-size:13.5px; line-height:1.7; color:#33506b">
+        <h3 style="color:#0b3d5c; font-size:15px; margin-bottom:6px">🔹 التحميل المخصص</h3>
+        <p style="margin-bottom:12px">يُستخدم للاستخدام الداخلي وإدخال البيانات المتغيرة بواسطة المنظم. يُدخل فيه جميع الأرقام يدوياً (بما فيها التراكمي) وتُرسل الصور مباشرة.</p>
+        
+        <h3 style="color:#0b3d5c; font-size:15px; margin-bottom:6px">🔹 التحميل المعتمد</h3>
+        <p style="margin-bottom:12px">يُستخدم في نهاية اليوم. يتم إدخال أرقام اليوم فقط، ويقوم التطبيق بجمعها تلقائياً مع "الرصيد السابق".<br><br>
+        <b>أزرار الرصيد:</b><br>
+        - <b>اعتماد الحالي:</b> يجمع (السابق + اليوم) ليصبح هو رصيد الغد.<br>
+        - <b>تثبيت المعدل:</b> إذا قمت بتعديل حقل "الرصيد السابق" يدوياً، اضغط هنا ليعتمده.<br>
+        - <b>تصفير:</b> لمسح الرصيد السابق والبدء من الصفر.</p>
+
+        <h3 style="color:#0b3d5c; font-size:15px; margin-bottom:6px">🔹 الأرشفة التلقائية</h3>
+        <p>بمجرد الضغط على واتساب أو حفظ صورة، يقوم النظام تلقائياً بحفظ السجل في الأرشيف السحابي (Excel والأرشيف). الصورة الملتقطة ستكون نظيفة وخالية من الأزرار.</p>
+        
+        <button class="btn" onclick="document.getElementById('infoModal').classList.remove('show')" style="width:100%; margin-top:15px; background:#0b3d5c">فهمت</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- نافذة كلمة المرور (للأرشيف فقط) -->
   <div id="passwordModal" class="modal">
     <div class="modal-content" style="max-width:340px">
       <div class="modal-header">
@@ -290,28 +427,15 @@
         <button class="close-btn" id="closePassword">×</button>
       </div>
       <div class="modal-body" style="padding:20px">
-        <p style="text-align:center;color:#b91c1c;font-weight:700;margin-bottom:16px;font-size:14px;line-height:1.7">
-          غير مصرح لك الحذف إذا لم تمتلك كلمة المرور
+        <p style="text-align:center;color:#b91c1c;font-weight:700;margin-bottom:16px;font-size:13px;line-height:1.7">
+          غير مصرح لك الحذف من الأرشيف إذا لم تمتلك كلمة المرور
         </p>
-        <input type="password" id="passwordInput" inputmode="numeric"
-               placeholder="•••••••" maxlength="20"
-               style="width:100%;padding:12px;text-align:center;font-size:18px;
-                      border:2px solid #cbdce8;border-radius:10px;outline:none;
-                      direction:ltr;letter-spacing:4px;font-weight:700" />
-        <p id="passwordError"
-           style="text-align:center;color:#dc2626;font-size:13px;
-                  margin-top:10px;font-weight:700;display:none">
-          ❌ كلمة المرور غير صحيحة
-        </p>
+        <input type="password" id="passwordInput" inputmode="numeric" placeholder="•••••••" maxlength="20"
+               style="width:100%;padding:12px;text-align:center;font-size:18px;border:2px solid #cbdce8;border-radius:10px;outline:none;direction:ltr;letter-spacing:4px;font-weight:700" />
+        <p id="passwordError" style="text-align:center;color:#dc2626;font-size:12px;margin-top:10px;font-weight:700;display:none">❌ كلمة المرور غير صحيحة</p>
         <div style="display:flex;gap:8px;margin-top:14px">
-          <button class="btn" id="confirmPassword"
-                  style="flex:1;background:linear-gradient(135deg,#25d366,#128c7e)">
-            تأكيد
-          </button>
-          <button class="btn" id="cancelPassword"
-                  style="flex:1;background:linear-gradient(135deg,#94a3b8,#64748b)">
-            إلغاء
-          </button>
+          <button class="btn" id="confirmPassword" style="flex:1;background:linear-gradient(135deg,#25d366,#128c7e)">تأكيد</button>
+          <button class="btn" id="cancelPassword" style="flex:1;background:linear-gradient(135deg,#94a3b8,#64748b)">إلغاء</button>
         </div>
       </div>
     </div>
@@ -320,9 +444,7 @@
   <div id="overlay"><div class="box"><span class="spin"></span><span id="ovText">جاري تحضير الصورة...</span></div></div>
 
 <script>
-/* =========================================================
-   ⚙️ إعداد Firebase الخاص بك
-   ========================================================= */
+/* ================= إعداد Firebase ================= */
 const firebaseConfig = {
   apiKey: "AIzaSyA6etxglLiUfiUDRPT7jigoCJtbAPwzWmnw",
   authDomain: "manasa-ece8c.firebaseapp.com",
@@ -340,19 +462,17 @@ const archiveRef = () => db.collection('archive');
 try {
   firebase.initializeApp(firebaseConfig);
   db = firebase.firestore();
-  db.enablePersistence({ synchronizeTabs: true }).catch(err => {
-    console.log('Persistence:', err.code);
-  });
-} catch(e) {
-  console.error('Firebase init failed:', e);
-}
+  db.enablePersistence({ synchronizeTabs: true }).catch(err => console.log('Persistence:', err.code));
+} catch(e) { console.error('Firebase init failed:', e); }
 
-/* ========== البيانات ========== */
+/* ================= المتغيرات ================= */
 const ARCHIVE_KEY = 'al_tuba_archive';
+const PREV_BALANCE_KEY = 'al_tuba_prev_balance';
 let currentArchive = [];
 let archiveLoaded = false;
+let currentMode = 'custom'; 
 
-/* ========== عناصر DOM ========== */
+/* ================= عناصر DOM ================= */
 const pad = n => String(n).padStart(2, '0');
 const overlay  = document.getElementById('overlay');
 const ovText   = document.getElementById('ovText');
@@ -360,6 +480,7 @@ const cardEl   = document.getElementById('card');
 const btnWa    = document.getElementById('btnWa');
 const btnSave  = document.getElementById('btnSave');
 const btnClear = document.getElementById('btnClear');
+const btnInfo  = document.getElementById('btnInfo');
 const archiveModal      = document.getElementById('archiveModal');
 const archiveList       = document.getElementById('archiveList');
 const archiveSearch     = document.getElementById('archiveSearch');
@@ -371,42 +492,42 @@ const btnMigrate        = document.getElementById('btnMigrate');
 const showOverlay = t => { ovText.textContent = t; overlay.classList.add('show'); };
 const hideOverlay = () => overlay.classList.remove('show');
 
-/* ========== Toast ========== */
+/* ================= أدوات مساعدة ================= */
 function showToast(message, duration = 2800){
   const t = document.createElement('div');
   t.textContent = message;
-  t.style.cssText = `
-    position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
-    background:#0b3d5c;color:#fff;padding:11px 22px;border-radius:10px;
-    font-weight:700;font-size:13.5px;z-index:2000;
-    box-shadow:0 8px 24px rgba(0,0,0,.4);opacity:0;
-    transition:opacity .3s, transform .3s;pointer-events:none;
-    max-width:90vw;text-align:center;
-  `;
+  t.style.cssText = `position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#0b3d5c;color:#fff;padding:11px 22px;border-radius:10px;font-weight:700;font-size:13.5px;z-index:2000;box-shadow:0 8px 24px rgba(0,0,0,.4);opacity:0;transition:opacity .3s, transform .3s;pointer-events:none;max-width:90vw;text-align:center;`;
   document.body.appendChild(t);
-  requestAnimationFrame(() => {
-    t.style.opacity = '1';
-    t.style.transform = 'translateX(-50%) translateY(0)';
-  });
-  setTimeout(() => {
-    t.style.opacity = '0';
-    t.style.transform = 'translateX(-50%) translateY(20px)';
-    setTimeout(() => t.remove(), 350);
-  }, duration);
+  requestAnimationFrame(() => { t.style.opacity = '1'; t.style.transform = 'translateX(-50%) translateY(0)'; });
+  setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(-50%) translateY(20px)'; setTimeout(() => t.remove(), 350); }, duration);
 }
 
-/* ========== مساعدات ========== */
 function buildFileName(){
   const d = new Date();
-  return `Al-Tuba-Oil-Depot_${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}.png`;
+  return `Al-Tuba_${currentMode === 'approved' ? 'معتمد' : 'مخصص'}_${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}.png`;
 }
 
 async function cardToBlob(){
   if (typeof html2canvas !== 'function') throw new Error('تعذّر تحميل مكتبة الصور');
-  const canvas = await html2canvas(cardEl, { scale: 2, backgroundColor: '#ffffff', useCORS: true });
-  const blob = await new Promise(res => canvas.toBlob(res, 'image/png', 1.0));
-  if (!blob) throw new Error('فشل إنشاء الصورة');
-  return blob;
+  
+  const hideEls = document.querySelectorAll('.hide-capture');
+  const originalDisplays = [];
+  
+  hideEls.forEach(el => {
+    originalDisplays.push(el.style.display);
+    el.style.display = 'none';
+  });
+
+  try {
+    const canvas = await html2canvas(cardEl, { scale: 2, backgroundColor: '#ffffff', useCORS: true });
+    const blob = await new Promise(res => canvas.toBlob(res, 'image/png', 1.0));
+    if (!blob) throw new Error('فشل إنشاء الصورة');
+    return blob;
+  } finally {
+    hideEls.forEach((el, index) => {
+      el.style.display = originalDisplays[index];
+    });
+  }
 }
 
 function downloadBlob(blob, fileName){
@@ -420,25 +541,93 @@ function downloadBlob(blob, fileName){
 function formatISODate(iso){
   if (!iso) return '—';
   const [y,m,d] = iso.split('-');
-  if (!y||!m||!d) return iso;
-  return `${d}/${m}/${y}`;
+  return (!y||!m||!d) ? iso : `${d}/${m}/${y}`;
 }
 
 function escapeHTML(s){
-  return String(s).replace(/[&<>"']/g, c => ({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-  }[c]));
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
 function updateSyncStatus(state){
   syncStatus.className = 'sync-indicator ' + state;
-  if (state === 'online')  syncStatus.textContent = '🟢 متصل بالسحابة';
+  if (state === 'online')  syncStatus.textContent = '🟢 سحابي';
   if (state === 'offline') syncStatus.textContent = '🔴 غير متصل';
-  if (state === 'loading') syncStatus.textContent = '⏳ جاري الاتصال...';
-  if (state === 'local')   syncStatus.textContent = '💾 محلي فقط';
+  if (state === 'loading') syncStatus.textContent = '⏳ اتصال...';
 }
 
-/* ========== طبقة البيانات ========== */
+/* ================= التبويبات ================= */
+window.switchTab = function(mode) {
+  currentMode = mode;
+  document.getElementById('tabCustom').classList.toggle('active', mode === 'custom');
+  document.getElementById('tabApproved').classList.toggle('active', mode === 'approved');
+  document.getElementById('formCustom').style.display = mode === 'custom' ? 'block' : 'none';
+  document.getElementById('formApproved').style.display = mode === 'approved' ? 'block' : 'none';
+};
+
+/* ================= التحميل المعتمد ================= */
+function loadPrevBalance(){
+  const prev = JSON.parse(localStorage.getItem(PREV_BALANCE_KEY) || '{"tankers":"","barrels":""}');
+  document.getElementById('prevCumTankers').value = prev.tankers || '';
+  document.getElementById('prevCumBarrels').value = prev.barrels || '';
+  calculateApprovedTotals();
+}
+
+function calculateApprovedTotals(){
+  const prevT = parseFloat(document.getElementById('prevCumTankers').value) || 0;
+  const prevB = parseFloat(document.getElementById('prevCumBarrels').value) || 0;
+  const dailyT = parseFloat(document.getElementById('tankersApproved').value) || 0;
+  const dailyB = parseFloat(document.getElementById('barrelsApproved').value) || 0;
+  
+  const totalT = prevT + dailyT;
+  const totalB = prevB + dailyB;
+  
+  document.getElementById('displayCumTankers').textContent = totalT > 0 ? totalT.toFixed(2).replace(/\.00$/, '') : '0';
+  document.getElementById('displayCumBarrels').textContent = totalB > 0 ? totalB.toFixed(3).replace(/\.000$/, '') : '0';
+}
+
+['prevCumTankers','prevCumBarrels','tankersApproved','barrelsApproved'].forEach(id => {
+  document.getElementById(id).addEventListener('input', calculateApprovedTotals);
+});
+
+document.getElementById('btnUpdateBalance').addEventListener('click', () => {
+  const finalT = document.getElementById('displayCumTankers').textContent;
+  const finalB = document.getElementById('displayCumBarrels').textContent;
+  
+  if (finalT === '0' && finalB === '0') { alert('الرجاء إدخال بيانات أولاً.'); return; }
+  if (!confirm(`هل تريد اعتماد الرصيد التالي كرصيد سابق لليوم التالي؟\n\nالصهاريج: ${finalT}\nالبراميل: ${finalB}`)) return;
+
+  document.getElementById('prevCumTankers').value = finalT;
+  document.getElementById('prevCumBarrels').value = finalB;
+  document.getElementById('tankersApproved').value = '';
+  document.getElementById('barrelsApproved').value = '';
+  
+  localStorage.setItem(PREV_BALANCE_KEY, JSON.stringify({ tankers: finalT, barrels: finalB }));
+  calculateApprovedTotals();
+  showToast('✓ تم اعتماد الرصيد للسجل التالي');
+});
+
+document.getElementById('btnSavePrevBalance').addEventListener('click', () => {
+  const currentPrevT = document.getElementById('prevCumTankers').value;
+  const currentPrevB = document.getElementById('prevCumBarrels').value;
+
+  if (!currentPrevT && !currentPrevB) { alert('الرجاء كتابة الرصيد السابق أولاً.'); return; }
+
+  localStorage.setItem(PREV_BALANCE_KEY, JSON.stringify({ tankers: currentPrevT, barrels: currentPrevB }));
+  showToast('✓ تم تثبيت الرصيد السابق المعدل');
+});
+
+document.getElementById('btnClearPrevBalance').addEventListener('click', () => {
+  if (!confirm('هل أنت متأكد من تصفير الرصيد السابق؟ سيبدأ الحساب من الصفر.')) return;
+  document.getElementById('prevCumTankers').value = '';
+  document.getElementById('prevCumBarrels').value = '';
+  localStorage.removeItem(PREV_BALANCE_KEY);
+  calculateApprovedTotals();
+  showToast('🧹 تم تصفير الرصيد السابق');
+});
+
+loadPrevBalance();
+
+/* ================= السحابة ================= */
 async function initArchive(){
   updateSyncStatus('loading');
   archiveRef().orderBy('id', 'desc').onSnapshot(snapshot => {
@@ -452,15 +641,11 @@ async function initArchive(){
   });
 }
 
-async function addToArchive(record){
-  await archiveRef().add(record);
-}
-
+async function addToArchive(record){ await archiveRef().add(record); }
 async function removeFromArchive(id){
   const entry = currentArchive.find(e => e.id === id);
   if (entry && entry._docId) await archiveRef().doc(entry._docId).delete();
 }
-
 async function clearAllArchive(){
   const snapshot = await archiveRef().get();
   const batch = db.batch();
@@ -468,85 +653,47 @@ async function clearAllArchive(){
   await batch.commit();
 }
 
-/* ========== حفظ تلقائي ========== */
+/* ================= الأرشفة ================= */
 async function saveToArchive(){
-  const date       = document.getElementById('dateInput').value;
-  const tankers    = document.getElementById('tankers').value;
-  const barrels    = document.getElementById('barrels').value;
-  const cumTankers = document.getElementById('cumTankers').value;
-  const cumBarrels = document.getElementById('cumBarrels').value;
+  const date = document.getElementById('dateInput').value;
+  let record = { id: Date.now(), mode: currentMode, date };
+  let savedAt = `${pad(new Date().getDate())}/${pad(new Date().getMonth()+1)}/${new Date().getFullYear()} ${pad(new Date().getHours())}:${pad(new Date().getMinutes())}`;
+  record.savedAt = savedAt;
 
-  if (!date && !tankers && !barrels && !cumTankers && !cumBarrels) return false;
+  if (currentMode === 'custom') {
+    record.tankers = document.getElementById('tankersCustom').value;
+    record.barrels = document.getElementById('barrelsCustom').value;
+    record.cumTankers = document.getElementById('cumTankersCustom').value;
+    record.cumBarrels = document.getElementById('cumBarrelsCustom').value;
+    if (!date && !record.tankers && !record.barrels && !record.cumTankers && !record.cumBarrels) return false;
+  } else {
+    record.prevTankers = document.getElementById('prevCumTankers').value;
+    record.prevBarrels = document.getElementById('prevCumBarrels').value;
+    record.tankers = document.getElementById('tankersApproved').value;
+    record.barrels = document.getElementById('barrelsApproved').value;
+    record.cumTankers = document.getElementById('displayCumTankers').textContent;
+    record.cumBarrels = document.getElementById('displayCumBarrels').textContent;
+    if (!date && !record.tankers && !record.barrels) return false;
+  }
 
   if (currentArchive.length > 0) {
     const last = currentArchive[0];
-    if (last.date === date && last.tankers === tankers &&
-        last.barrels === barrels && last.cumTankers === cumTankers &&
-        last.cumBarrels === cumBarrels) {
+    if (last.date === date && last.tankers === record.tankers && last.barrels === record.barrels && last.cumTankers === record.cumTankers && last.mode === currentMode) {
       return false;
     }
   }
-
-  const now = new Date();
-  const savedAt = `${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
-
-  const record = {
-    id: Date.now(),
-    date, savedAt, tankers, barrels, cumTankers, cumBarrels
-  };
 
   try {
     await addToArchive(record);
     return true;
   } catch(e) {
     console.error('Save failed:', e);
-    showToast('❌ فشل الاتصال بالسحابة، تم الحفظ محلياً فقط');
-    const local = JSON.parse(localStorage.getItem(ARCHIVE_KEY) || '[]');
-    local.unshift(record);
-    localStorage.setItem(ARCHIVE_KEY, JSON.stringify(local));
-    return true;
+    showToast('❌ فشل الاتصال بالسحابة');
+    return false;
   }
 }
 
-/* ========== زر الترحيل (Migration) ========== */
-btnMigrate.addEventListener('click', async () => {
-  const localData = JSON.parse(localStorage.getItem(ARCHIVE_KEY) || '[]');
-  
-  if (localData.length === 0) {
-    alert('لا توجد سجلات قديمة في هذا الجهاز لترحيلها.\n\nملاحظة: السجلات القديمة تكون محفوظة فقط على الجهاز الذي أدخلتها عليه قبل ربط السحابة.');
-    return;
-  }
-
-  if (!confirm(`هل أنت متأكد من ترحيل ${localData.length} سجل قديم إلى السحابة؟\nسيتم مسحها من الذاكرة المحلية لتجنب التكرار.`)) return;
-
-  const oldText = btnMigrate.textContent;
-  btnMigrate.textContent = '⏳ جاري الترحيل...';
-  btnMigrate.disabled = true;
-
-  try {
-    for (let i = 0; i < localData.length; i += 500) {
-      const batch = db.batch();
-      const chunk = localData.slice(i, i + 500);
-      chunk.forEach(record => {
-        const docRef = archiveRef().doc(); 
-        batch.set(docRef, record);
-      });
-      await batch.commit();
-    }
-
-    localStorage.removeItem(ARCHIVE_KEY);
-    btnMigrate.textContent = oldText;
-    btnMigrate.disabled = false;
-    showToast(`✓ تم ترحيل ${localData.length} سجل بنجاح!`);
-  } catch (error) {
-    console.error('Migration failed:', error);
-    alert('حدث خطأ أثناء الترحيل: ' + error.message);
-    btnMigrate.textContent = oldText;
-    btnMigrate.disabled = false;
-  }
-});
-
-/* ========== عرض الأرشيف ========== */
+/* ================= عرض الأرشيف ================= */
 function renderArchive(){
   if (!archiveLoaded) {
     archiveList.innerHTML = '<div class="empty">⏳ جاري تحميل البيانات...</div>';
@@ -564,9 +711,7 @@ function renderArchive(){
       String(e.savedAt || '').toLowerCase().includes(textFilter) ||
       formatISODate(e.date).includes(textFilter) ||
       String(e.tankers || '').includes(textFilter) ||
-      String(e.barrels || '').includes(textFilter) ||
-      String(e.cumTankers || '').includes(textFilter) ||
-      String(e.cumBarrels || '').includes(textFilter)
+      String(e.barrels || '').includes(textFilter)
     );
   }
 
@@ -577,28 +722,40 @@ function renderArchive(){
     return;
   }
 
-  archiveList.innerHTML = filtered.map(e => `
+  archiveList.innerHTML = filtered.map(e => {
+    const badge = e.mode === 'approved' ? '<span class="badge approved">معتمد</span>' : '<span class="badge custom">مخصص</span>';
+    return `
     <div class="archive-item">
       <div class="archive-item-header">
-        <span>📅 ${formatISODate(escapeHTML(e.date))}</span>
+        <div>
+          ${badge}
+          <span>📅 ${formatISODate(escapeHTML(e.date))}</span>
+        </div>
         <span>🕐 ${escapeHTML(e.savedAt)}</span>
         <button class="del-btn" data-id="${e.id}" title="حذف">🗑️</button>
       </div>
       <div class="archive-item-body">
-        <div>عدد الصهاريج (يوم): <b>${escapeHTML(e.tankers) || '—'}</b></div>
-        <div>الكمية بالبرميل (يوم): <b>${escapeHTML(e.barrels) || '—'}</b></div>
-        <div>العدد التراكمي: <b>${escapeHTML(e.cumTankers) || '—'}</b></div>
-        <div>الكمية التراكمية: <b>${escapeHTML(e.cumBarrels) || '—'}</b></div>
+        <div>العدد المضاف: <b>${escapeHTML(e.tankers) || '—'}</b></div>
+        <div>الكمية المضافة: <b>${escapeHTML(e.barrels) || '—'}</b></div>
+        ${e.mode === 'approved' ? `
+          <div class="full-width" style="background:#ecfdf5;padding:4px;border-radius:4px;margin-top:4px;text-align:center">
+            المجموع التراكمي: <b>${escapeHTML(e.cumTankers)}</b> صهريج | <b>${escapeHTML(e.cumBarrels)}</b> برميل
+          </div>
+        ` : `
+          <div class="full-width" style="background:#f8fafc;padding:4px;border-radius:4px;margin-top:4px;text-align:center">
+            التراكمي المدخل: <b>${escapeHTML(e.cumTankers) || '—'}</b> صهريج | <b>${escapeHTML(e.cumBarrels) || '—'}</b> برميل
+          </div>
+        `}
       </div>
     </div>
-  `).join('');
+  `}).join('');
 
   archiveList.querySelectorAll('.del-btn').forEach(btn => {
     btn.addEventListener('click', () => requestDelete(Number(btn.dataset.id)));
   });
 }
 
-/* ========== كلمة المرور ========== */
+/* ================= كلمة المرور ================= */
 const DELETE_PASSWORD = '2291977';
 let passwordCallback = null;
 const passwordModal = document.getElementById('passwordModal');
@@ -634,44 +791,35 @@ document.getElementById('confirmPassword').addEventListener('click', () => {
 
 document.getElementById('cancelPassword').addEventListener('click', closePasswordModal);
 document.getElementById('closePassword').addEventListener('click', closePasswordModal);
-passwordInput.addEventListener('keydown', e => {
-  if (e.key === 'Enter') document.getElementById('confirmPassword').click();
-});
-passwordModal.addEventListener('click', e => {
-  if (e.target === passwordModal) closePasswordModal();
-});
+passwordInput.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('confirmPassword').click(); });
+passwordModal.addEventListener('click', e => { if (e.target === passwordModal) closePasswordModal(); });
 
 async function requestDelete(id){
   requirePassword(async () => {
     try {
       await removeFromArchive(id);
-      showToast('✓ تم حذف السجل من السحابة');
-    } catch(e) {
-      showToast('❌ فشل الحذف: ' + e.message);
-    }
+      showToast('✓ تم حذف السجل');
+    } catch(e) { showToast('❌ فشل الحذف'); }
   });
 }
 
-/* ========== فتح/إغلاق الأرشيف ========== */
-function openArchive(){
+/* ================= النوافذ ================= */
+document.getElementById('btnArchive').addEventListener('click', () => {
   archiveSearch.value = '';
   archiveDateFilter.value = '';
   archiveModal.classList.add('show');
   renderArchive();
-}
-function closeArchive(){ archiveModal.classList.remove('show'); }
-
-document.getElementById('btnArchive').addEventListener('click', openArchive);
-document.getElementById('closeArchive').addEventListener('click', closeArchive);
-archiveModal.addEventListener('click', e => {
-  if (e.target === archiveModal) closeArchive();
 });
+document.getElementById('closeArchive').addEventListener('click', () => archiveModal.classList.remove('show'));
+archiveModal.addEventListener('click', e => { if (e.target === archiveModal) archiveModal.classList.remove('show'); });
 archiveSearch.addEventListener('input', renderArchive);
 archiveDateFilter.addEventListener('change', renderArchive);
 document.getElementById('btnResetFilter').addEventListener('click', () => {
-  archiveSearch.value = '';
-  archiveDateFilter.value = '';
-  renderArchive();
+  archiveSearch.value = ''; archiveDateFilter.value = ''; renderArchive();
+});
+
+btnInfo.addEventListener('click', () => {
+  document.getElementById('infoModal').classList.add('show');
 });
 
 document.getElementById('btnClearArchive').addEventListener('click', () => {
@@ -679,37 +827,56 @@ document.getElementById('btnClearArchive').addEventListener('click', () => {
     try {
       await clearAllArchive();
       showToast('✓ تم حذف كل السجلات');
-    } catch(e) {
-      showToast('❌ فشل الحذف: ' + e.message);
-    }
+    } catch(e) { showToast('❌ فشل الحذف'); }
   });
 });
 
-/* ========== تصدير Excel ========== */
+/* ================= الترحيل ================= */
+btnMigrate.addEventListener('click', async () => {
+  const localData = JSON.parse(localStorage.getItem(ARCHIVE_KEY) || '[]');
+  if (localData.length === 0) {
+    alert('لا توجد سجلات قديمة في هذا الجهاز لترحيلها.');
+    return;
+  }
+  if (!confirm(`ترحيل ${localData.length} سجل قديم؟`)) return;
+
+  btnMigrate.disabled = true;
+  try {
+    for (let i = 0; i < localData.length; i += 500) {
+      const batch = db.batch();
+      localData.slice(i, i + 500).forEach(record => {
+        record.mode = record.mode || 'custom';
+        batch.set(archiveRef().doc(), record);
+      });
+      await batch.commit();
+    }
+    localStorage.removeItem(ARCHIVE_KEY);
+    showToast(`✓ تم ترحيل ${localData.length} سجل بنجاح!`);
+  } catch (error) {
+    alert('حدث خطأ: ' + error.message);
+  } finally {
+    btnMigrate.disabled = false;
+  }
+});
+
+/* ================= Excel ================= */
 function exportToExcel(silent = false){
-  const archive = currentArchive;
-  if (archive.length === 0) {
-    if (!silent) alert('الأرشيف فارغ، لا يوجد ما يُصدَّر.');
+  if (currentArchive.length === 0) {
+    if (!silent) alert('الأرشيف فارغ.');
     return false;
   }
-  if (typeof XLSX === 'undefined') {
-    if (!silent) alert('تعذّر تحميل مكتبة Excel');
-    return false;
-  }
-
-  const rows = archive.map(e => ({
-    'التاريخ'                   : formatISODate(e.date),
-    'وقت الحفظ'                 : e.savedAt || '',
-    'عدد الصهاريج (يوم)'        : e.tankers || '',
-    'الكمية بالبرميل (يوم)'     : e.barrels || '',
-    'العدد التراكمي للصهاريج'   : e.cumTankers || '',
-    'الكمية التراكمية بالبرميل' : e.cumBarrels || ''
+  const rows = currentArchive.map(e => ({
+    'نوع التحميل'             : e.mode === 'approved' ? 'معتمد' : 'مخصص',
+    'التاريخ'                 : formatISODate(e.date),
+    'وقت الحفظ'               : e.savedAt || '',
+    'العدد المضاف (يوم)'      : e.tankers || '',
+    'الكمية المضافة (يوم)'    : e.barrels || '',
+    'العدد التراكمي'          : e.cumTankers || '',
+    'الكمية التراكمية'        : e.cumBarrels || ''
   }));
-
   const ws = XLSX.utils.json_to_sheet(rows);
-  ws['!cols'] = [{wch:14},{wch:20},{wch:22},{wch:26},{wch:28},{wch:30}];
+  ws['!cols'] = [{wch:14},{wch:14},{wch:20},{wch:22},{wch:26},{wch:28},{wch:30}];
   try { ws['!views'] = [{ RTL: true }]; } catch(_){}
-
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'الأرشيف');
   XLSX.writeFile(wb, 'ارشيف الصهاريج.xlsx');
@@ -717,19 +884,15 @@ function exportToExcel(silent = false){
 }
 
 document.getElementById('btnExportExcel').addEventListener('click', () => {
-  if (exportToExcel(false)) showToast('✓ تم تصدير ملف Excel');
+  if (exportToExcel(false)) showToast('✓ تم تصدير Excel');
 });
 
 function autoSaveExcel(){
   if (currentArchive.length === 0) return;
-  setTimeout(() => {
-    try {
-      if (exportToExcel(true)) showToast('✓ تم حفظ ملف Excel تلقائياً');
-    } catch(e){ console.log('Excel auto-save failed:', e); }
-  }, 150);
+  setTimeout(() => { try { if (exportToExcel(true)) showToast('✓ تم حفظ Excel تلقائياً'); } catch(e){} }, 150);
 }
 
-/* ========== واتساب ========== */
+/* ================= أزرار الإرسال ================= */
 btnWa.addEventListener('click', async () => {
   await saveToArchive();
   autoSaveExcel();
@@ -739,34 +902,26 @@ btnWa.addEventListener('click', async () => {
   showOverlay('جاري تحضير الصورة...');
 
   try {
-    const blob     = await cardToBlob();
-    const fileName = buildFileName();
-    const file     = new File([blob], fileName, { type: 'image/png' });
+    const blob = await cardToBlob();
+    const file = new File([blob], buildFileName(), { type: 'image/png' });
 
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       try {
         await navigator.share({ files: [file] });
-        hideOverlay(); btnWa.disabled = false; btnWa.textContent = oldText;
-        return;
+        hideOverlay(); btnWa.disabled = false; btnWa.textContent = oldText; return;
       } catch(err) {
-        if (err.name === 'AbortError') {
-          hideOverlay(); btnWa.disabled = false; btnWa.textContent = oldText;
-          return;
-        }
+        if (err.name === 'AbortError') { hideOverlay(); btnWa.disabled = false; btnWa.textContent = oldText; return; }
       }
     }
-
-    hideOverlay();
-    downloadBlob(blob, fileName);
+    hideOverlay(); downloadBlob(blob, buildFileName());
     btnWa.disabled = false; btnWa.textContent = oldText;
-    alert('جهازك لا يدعم مشاركة الملفات مباشرة.\nتم حفظ الصورة: ' + fileName);
+    alert('تم حفظ الصورة (جهازك لا يدعم المشاركة المباشرة).');
   } catch(err) {
     hideOverlay(); btnWa.disabled = false; btnWa.textContent = oldText;
     alert('حدث خطأ: ' + err.message);
   }
 });
 
-/* ========== حفظ صورة ========== */
 btnSave.addEventListener('click', async () => {
   await saveToArchive();
   autoSaveExcel();
@@ -784,27 +939,33 @@ btnSave.addEventListener('click', async () => {
   }
 });
 
-/* ========== مسح النموذج ========== */
+/* ================= مسح النموذج ================= */
 btnClear.addEventListener('click', () => {
-  requirePassword(() => {
-    ['dateInput','tankers','barrels','cumTankers','cumBarrels'].forEach(id => {
+  if (!confirm('هل تريد مسح الحقول الحالية؟ (لن يتم مسح الرصيد التراكمي السابق)')) return;
+  
+  document.getElementById('dateInput').value = '';
+  
+  if (currentMode === 'custom') {
+    ['tankersCustom','barrelsCustom','cumTankersCustom','cumBarrelsCustom'].forEach(id => {
       document.getElementById(id).value = '';
     });
-    document.getElementById('dateInput').focus();
-    showToast('✓ تم مسح النموذج');
-  });
+  } else {
+    ['tankersApproved','barrelsApproved'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    calculateApprovedTotals();
+  }
+  document.getElementById('dateInput').focus();
+  showToast('✓ تم مسح الحقول');
 });
 
-/* ========== بدء التشغيل ========== */
+/* ================= بدء التشغيل ================= */
 initArchive();
-
-/* ========== Service Worker ========== */
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js').catch(err => console.log('SW:', err));
   });
 }
 </script>
-
 </body>
 </html>
