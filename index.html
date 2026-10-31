@@ -16,16 +16,16 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
 
   body{
-    min-height:100vh;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    gap:18px;
+    min-height:100vh;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:18px;
     padding:24px 16px calc(24px + env(safe-area-inset-bottom));
     font-family:"Segoe UI", Tahoma, Arial, sans-serif;
     background:radial-gradient(circle at 20% 10%, #1b4b68, #0a1c28 65%);
@@ -33,9 +33,8 @@
   }
 
   .card{
-    width:100%;max-width:470px;
-    background:#ffffff;border-radius:18px;overflow:hidden;
-    box-shadow:0 18px 45px rgba(0,0,0,.45);
+    width:100%;max-width:470px;background:#fff;border-radius:18px;
+    overflow:hidden;box-shadow:0 18px 45px rgba(0,0,0,.45);
   }
 
   .head{
@@ -65,11 +64,9 @@
   .row:last-child{border-bottom:0}
 
   .lbl{font-size:14px;font-weight:600;color:#33506b;white-space:nowrap}
-
   .sep{height:1px;background:#e6edf3;margin:8px 0}
 
-  input[type=number],
-  input[type=date]{
+  input[type=number],input[type=date]{
     width:150px;flex:0 0 auto;padding:7px 10px;
     font-family:inherit;font-size:15px;font-weight:800;
     text-align:center;direction:ltr;
@@ -77,8 +74,7 @@
     border:1px solid #cbdce8;border-radius:9px;outline:none;
     transition:border-color .15s, box-shadow .15s, background .15s;
   }
-  input[type=number]:focus,
-  input[type=date]:focus{
+  input[type=number]:focus,input[type=date]:focus{
     background:#fff;border-color:#14719c;
     box-shadow:0 0 0 3px rgba(20,113,156,.15);
   }
@@ -92,10 +88,7 @@
     padding:12px;color:#5b7a92;background:#f4f8fb;border-top:1px solid #e3edf4;
   }
 
-  .btns{
-    width:100%;max-width:470px;
-    display:flex;flex-wrap:wrap;gap:10px;
-  }
+  .btns{width:100%;max-width:470px;display:flex;flex-wrap:wrap;gap:10px}
   .btn{
     flex:1 1 130px;border:0;border-radius:12px;padding:13px 10px;
     font-family:inherit;font-size:14px;font-weight:700;color:#fff;
@@ -109,7 +102,6 @@
   .btn.archive{background:linear-gradient(135deg,#8b5cf6,#6d28d9)}
   .btn.clear  {background:linear-gradient(135deg,#ef4444,#b91c1c)}
 
-  /* ===== النوافذ المنبثقة ===== */
   .modal{
     display:none;position:fixed;inset:0;
     background:rgba(6,20,30,.75);z-index:1000;
@@ -124,13 +116,21 @@
   }
   .modal-header{
     padding:14px 18px;background:linear-gradient(135deg,#0b3d5c,#14719c);
-    color:#fff;display:flex;justify-content:space-between;align-items:center;
+    color:#fff;display:flex;justify-content:space-between;align-items:center;gap:10px;
   }
   .modal-header h2{font-size:17px;font-weight:800}
   .close-btn{
     background:transparent;border:0;color:#fff;font-size:26px;
     line-height:1;cursor:pointer;padding:0 4px;
   }
+
+  .sync-indicator{
+    font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;
+    background:rgba(255,255,255,.2);
+  }
+  .sync-indicator.online{background:#10b981}
+  .sync-indicator.offline{background:#ef4444}
+  .sync-indicator.loading{background:#f59e0b}
 
   .modal-toolbar{
     padding:10px 12px;background:#f4f8fb;
@@ -140,8 +140,7 @@
   .modal-toolbar input{
     flex:1 1 140px;padding:9px 12px;
     border:1px solid #cbdce8;border-radius:9px;
-    font-family:inherit;font-size:14px;
-    background:#fff;outline:none;
+    font-family:inherit;font-size:14px;background:#fff;outline:none;
   }
   .modal-toolbar input:focus{
     border-color:#14719c;
@@ -156,6 +155,7 @@
   .btn.excel{background:linear-gradient(135deg,#1e8e3e,#0d652d)}
   .btn.trash{background:linear-gradient(135deg,#ef4444,#b91c1c)}
   .btn.reset{background:linear-gradient(135deg,#94a3b8,#64748b);padding:9px 12px;font-size:12px}
+  .btn.migrate{background:linear-gradient(135deg,#3b82f6,#2563eb);padding:9px 14px;font-size:13px;border-radius:9px; display:none;}
 
   .modal-body{padding:12px;overflow-y:auto;flex:1}
 
@@ -185,15 +185,9 @@
     display:grid;grid-template-columns:1fr 1fr;
     gap:6px 12px;font-size:13px;color:#33506b;
   }
-  .archive-item-body b{
-    color:#0b3d5c;font-weight:800;
-    direction:ltr;display:inline-block;
-  }
+  .archive-item-body b{color:#0b3d5c;font-weight:800;direction:ltr;display:inline-block}
 
-  .empty{
-    text-align:center;padding:30px 10px;
-    color:#8ba3b8;font-weight:600;font-size:14px;
-  }
+  .empty{text-align:center;padding:30px 10px;color:#8ba3b8;font-weight:600;font-size:14px}
 
   #overlay{
     position:fixed;inset:0;background:rgba(6,20,30,.65);
@@ -216,8 +210,7 @@
 
   @media (max-width:420px){
     .lbl{font-size:12.5px;white-space:normal}
-    input[type=number],
-    input[type=date]{width:128px;font-size:14px}
+    input[type=number],input[type=date]{width:128px;font-size:14px}
     .head h1{font-size:19px}
     .archive-item-body{grid-template-columns:1fr}
   }
@@ -234,29 +227,23 @@
 
     <div class="body">
       <div class="site">موقع شمعات تحميل (مستودع الطوبة)</div>
-
       <div class="row">
         <label class="lbl" for="dateInput">التاريخ</label>
         <input id="dateInput" type="date">
       </div>
-
       <div class="sep"></div>
-
       <div class="row">
         <label class="lbl" for="tankers">عدد الصهاريج (يوم)</label>
         <input id="tankers" type="number" step="any" inputmode="decimal">
       </div>
-
       <div class="row">
         <label class="lbl" for="barrels">الكمية بالبرميل (يوم)</label>
         <input id="barrels" type="number" step="any" inputmode="decimal">
       </div>
-
       <div class="row">
         <label class="lbl" for="cumTankers">العدد التراكمي للصهاريج</label>
         <input id="cumTankers" type="number" step="any" inputmode="decimal">
       </div>
-
       <div class="row">
         <label class="lbl" for="cumBarrels">الكمية التراكمية بالبرميل</label>
         <input id="cumBarrels" type="number" step="any" inputmode="decimal">
@@ -273,17 +260,19 @@
     <button class="btn clear"   id="btnClear">مسح</button>
   </div>
 
-  <!-- ===== نافذة الأرشيف ===== -->
   <div id="archiveModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
         <h2>📂 أرشيف الصهاريج</h2>
+        <span id="syncStatus" class="sync-indicator loading">⏳ جاري الاتصال...</span>
         <button class="close-btn" id="closeArchive">×</button>
       </div>
       <div class="modal-toolbar">
         <input type="text" id="archiveSearch" placeholder="🔍 بحث بالتاريخ أو الرقم...">
         <input type="date" id="archiveDateFilter">
         <button class="btn reset" id="btnResetFilter">🔄 الكل</button>
+        <!-- زر الترحيل يظهر هنا -->
+        <button class="btn migrate" id="btnMigrate">☁️ ترحيل للسحابة</button>
         <button class="btn excel" id="btnExportExcel">📊 Excel</button>
         <button class="btn trash" id="btnClearArchive">🗑️ حذف الكل</button>
       </div>
@@ -294,7 +283,6 @@
     </div>
   </div>
 
-  <!-- ===== نافذة كلمة المرور ===== -->
   <div id="passwordModal" class="modal">
     <div class="modal-content" style="max-width:340px">
       <div class="modal-header">
@@ -332,20 +320,59 @@
   <div id="overlay"><div class="box"><span class="spin"></span><span id="ovText">جاري تحضير الصورة...</span></div></div>
 
 <script>
-/* ================= أدوات عامة ================= */
-const pad = n => String(n).padStart(2, '0');
+/* =========================================================
+   ⚙️ إعداد Firebase الخاص بك (تم وضعه بناءً على صورتك)
+   ========================================================= */
+const firebaseConfig = {
+  apiKey: "AIzaSyA6etxglLiUfiUDRPT7jigoCJtbAPwzWmnw",
+  authDomain: "manasa-ece8c.firebaseapp.com",
+  projectId: "manasa-ece8c",
+  storageBucket: "manasa-ece8c.firebasestorage.app",
+  messagingSenderId: "497003265490",
+  appId: "1:497003265490:web:78c01c0d14eeed972b1c0b",
+  measurementId: "G-36P5JTVYZM"
+};
 
+/* ========== تهيئة Firebase ========== */
+const USE_CLOUD = true;
+let db = null;
+const archiveRef = () => db.collection('archive');
+
+try {
+  firebase.initializeApp(firebaseConfig);
+  db = firebase.firestore();
+  db.enablePersistence({ synchronizeTabs: true }).catch(err => {
+    console.log('Persistence:', err.code);
+  });
+} catch(e) {
+  console.error('Firebase init failed:', e);
+}
+
+/* ========== البيانات ========== */
+const ARCHIVE_KEY = 'al_tuba_archive';
+let currentArchive = [];
+let archiveLoaded = false;
+
+/* ========== عناصر DOM ========== */
+const pad = n => String(n).padStart(2, '0');
 const overlay  = document.getElementById('overlay');
 const ovText   = document.getElementById('ovText');
 const cardEl   = document.getElementById('card');
 const btnWa    = document.getElementById('btnWa');
 const btnSave  = document.getElementById('btnSave');
 const btnClear = document.getElementById('btnClear');
+const archiveModal      = document.getElementById('archiveModal');
+const archiveList       = document.getElementById('archiveList');
+const archiveSearch     = document.getElementById('archiveSearch');
+const archiveDateFilter = document.getElementById('archiveDateFilter');
+const archiveCount      = document.getElementById('archiveCount');
+const syncStatus        = document.getElementById('syncStatus');
+const btnMigrate        = document.getElementById('btnMigrate');
 
-const showOverlay = (t) => { ovText.textContent = t; overlay.classList.add('show'); };
+const showOverlay = t => { ovText.textContent = t; overlay.classList.add('show'); };
 const hideOverlay = () => overlay.classList.remove('show');
 
-/* Toast إشعار صغير */
+/* ========== Toast ========== */
 function showToast(message, duration = 2800){
   const t = document.createElement('div');
   t.textContent = message;
@@ -369,21 +396,17 @@ function showToast(message, duration = 2800){
   }, duration);
 }
 
+/* ========== مساعدات ========== */
 function buildFileName(){
   const d = new Date();
-  const stamp = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}`;
-  return `Al-Tuba-Oil-Depot_${stamp}.png`;
+  return `Al-Tuba-Oil-Depot_${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}.png`;
 }
 
 async function cardToBlob(){
-  if (typeof html2canvas !== 'function'){
-    throw new Error('تعذّر تحميل مكتبة الصور، تحقق من الاتصال بالإنترنت.');
-  }
-  const canvas = await html2canvas(cardEl, {
-    scale: 2, backgroundColor: '#ffffff', useCORS: true
-  });
+  if (typeof html2canvas !== 'function') throw new Error('تعذّر تحميل مكتبة الصور');
+  const canvas = await html2canvas(cardEl, { scale: 2, backgroundColor: '#ffffff', useCORS: true });
   const blob = await new Promise(res => canvas.toBlob(res, 'image/png', 1.0));
-  if (!blob) throw new Error('فشل إنشاء الصورة.');
+  if (!blob) throw new Error('فشل إنشاء الصورة');
   return blob;
 }
 
@@ -394,20 +417,6 @@ function downloadBlob(blob, fileName){
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 4000);
 }
-
-/* ================= الأرشيف ================= */
-const ARCHIVE_KEY = 'al_tuba_archive';
-const archiveModal     = document.getElementById('archiveModal');
-const archiveList      = document.getElementById('archiveList');
-const archiveSearch    = document.getElementById('archiveSearch');
-const archiveDateFilter= document.getElementById('archiveDateFilter');
-const archiveCount     = document.getElementById('archiveCount');
-
-function getArchive(){
-  try { return JSON.parse(localStorage.getItem(ARCHIVE_KEY) || '[]'); }
-  catch { return []; }
-}
-function setArchive(arr){ localStorage.setItem(ARCHIVE_KEY, JSON.stringify(arr)); }
 
 function formatISODate(iso){
   if (!iso) return '—';
@@ -422,8 +431,47 @@ function escapeHTML(s){
   }[c]));
 }
 
-/* حفظ تلقائي — يُستدعى من زر واتساب وزر حفظ الصورة */
-function saveToArchive(){
+function updateSyncStatus(state){
+  syncStatus.className = 'sync-indicator ' + state;
+  if (state === 'online')  syncStatus.textContent = '🟢 متصل بالسحابة';
+  if (state === 'offline') syncStatus.textContent = '🔴 غير متصل';
+  if (state === 'loading') syncStatus.textContent = '⏳ جاري الاتصال...';
+  if (state === 'local')   syncStatus.textContent = '💾 محلي فقط';
+}
+
+/* ========== طبقة البيانات الموحدة ========== */
+async function initArchive(){
+  updateSyncStatus('loading');
+  archiveRef().orderBy('id', 'desc').onSnapshot(snapshot => {
+    currentArchive = snapshot.docs.map(d => ({ _docId: d.id, ...d.data() }));
+    archiveLoaded = true;
+    updateSyncStatus('online');
+    if (archiveModal.classList.contains('show')) renderArchive();
+    checkMigrationStatus(); // فحص وجود سجلات محلية
+  }, err => {
+    console.error('Snapshot error:', err);
+    updateSyncStatus('offline');
+  });
+}
+
+async function addToArchive(record){
+  await archiveRef().add(record);
+}
+
+async function removeFromArchive(id){
+  const entry = currentArchive.find(e => e.id === id);
+  if (entry && entry._docId) await archiveRef().doc(entry._docId).delete();
+}
+
+async function clearAllArchive(){
+  const snapshot = await archiveRef().get();
+  const batch = db.batch();
+  snapshot.docs.forEach(d => batch.delete(d.ref));
+  await batch.commit();
+}
+
+/* ========== حفظ تلقائي في الأرشيف ========== */
+async function saveToArchive(){
   const date       = document.getElementById('dateInput').value;
   const tankers    = document.getElementById('tankers').value;
   const barrels    = document.getElementById('barrels').value;
@@ -432,15 +480,11 @@ function saveToArchive(){
 
   if (!date && !tankers && !barrels && !cumTankers && !cumBarrels) return false;
 
-  const archive = getArchive();
-
-  if (archive.length > 0){
-    const last = archive[0];
-    if (last.date === date &&
-        last.tankers === tankers &&
-        last.barrels === barrels &&
-        last.cumTankers === cumTankers &&
-        last.cumBarrels === cumBarrels){
+  if (currentArchive.length > 0) {
+    const last = currentArchive[0];
+    if (last.date === date && last.tankers === tankers &&
+        last.barrels === barrels && last.cumTankers === cumTankers &&
+        last.cumBarrels === cumBarrels) {
       return false;
     }
   }
@@ -448,26 +492,83 @@ function saveToArchive(){
   const now = new Date();
   const savedAt = `${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
 
-  archive.unshift({
+  const record = {
     id: Date.now(),
-    date, savedAt,
-    tankers, barrels, cumTankers, cumBarrels
-  });
-  setArchive(archive);
-  return true;
+    date, savedAt, tankers, barrels, cumTankers, cumBarrels
+  };
+
+  try {
+    await addToArchive(record);
+    return true;
+  } catch(e) {
+    console.error('Save failed:', e);
+    showToast('❌ فشل الاتصال بالسحابة، تم الحفظ محلياً فقط');
+    // احتياطي: حفظ محلي
+    const local = JSON.parse(localStorage.getItem(ARCHIVE_KEY) || '[]');
+    local.unshift(record);
+    localStorage.setItem(ARCHIVE_KEY, JSON.stringify(local));
+    return true;
+  }
 }
 
+/* ========== نظام الترحيل (Migration) ========== */
+function checkMigrationStatus(){
+  if (!USE_CLOUD) return;
+  const localData = JSON.parse(localStorage.getItem(ARCHIVE_KEY) || '[]');
+  if (localData.length > 0) {
+    btnMigrate.style.display = 'inline-block';
+    btnMigrate.textContent = `☁️ ترحيل (${localData.length}) للسحابة`;
+  } else {
+    btnMigrate.style.display = 'none';
+  }
+}
+
+btnMigrate.addEventListener('click', async () => {
+  const localData = JSON.parse(localStorage.getItem(ARCHIVE_KEY) || '[]');
+  if (localData.length === 0) return;
+
+  if (!confirm(`هل أنت متأكد من ترحيل ${localData.length} سجل قديم إلى السحابة؟ سيتم مسحها من الذاكرة المحلية لتجنب التكرار.`)) return;
+
+  const oldText = btnMigrate.textContent;
+  btnMigrate.textContent = '⏳ جاري الترحيل...';
+  btnMigrate.disabled = true;
+
+  try {
+    // استخدام دفعات (Batches) لتجنب الحد الأقصى (500 سجل لكل دفعة)
+    for (let i = 0; i < localData.length; i += 500) {
+      const batch = db.batch();
+      const chunk = localData.slice(i, i + 500);
+      chunk.forEach(record => {
+        const docRef = archiveRef().doc(); // إنشاء معرف جديد
+        batch.set(docRef, record);
+      });
+      await batch.commit();
+    }
+
+    localStorage.removeItem(ARCHIVE_KEY); // مسح المحلي بعد النجاح
+    btnMigrate.style.display = 'none';
+    showToast(`✓ تم ترحيل ${localData.length} سجل بنجاح!`);
+  } catch (error) {
+    console.error('Migration failed:', error);
+    alert('حدث خطأ أثناء الترحيل: ' + error.message);
+    btnMigrate.textContent = oldText;
+    btnMigrate.disabled = false;
+  }
+});
+
+/* ========== عرض الأرشيف ========== */
 function renderArchive(){
+  if (!archiveLoaded) {
+    archiveList.innerHTML = '<div class="empty">⏳ جاري تحميل البيانات...</div>';
+    return;
+  }
+
   const textFilter = archiveSearch.value.trim().toLowerCase();
   const dateFilter = archiveDateFilter.value;
 
-  let filtered = getArchive();
-
-  if (dateFilter){
-    filtered = filtered.filter(e => e.date === dateFilter);
-  }
-
-  if (textFilter){
+  let filtered = currentArchive;
+  if (dateFilter) filtered = filtered.filter(e => e.date === dateFilter);
+  if (textFilter) {
     filtered = filtered.filter(e =>
       String(e.date || '').toLowerCase().includes(textFilter) ||
       String(e.savedAt || '').toLowerCase().includes(textFilter) ||
@@ -481,7 +582,7 @@ function renderArchive(){
 
   archiveCount.textContent = `إجمالي السجلات: ${filtered.length}`;
 
-  if (filtered.length === 0){
+  if (filtered.length === 0) {
     archiveList.innerHTML = '<div class="empty">لا توجد سجلات مطابقة</div>';
     return;
   }
@@ -503,17 +604,16 @@ function renderArchive(){
   `).join('');
 
   archiveList.querySelectorAll('.del-btn').forEach(btn => {
-    btn.addEventListener('click', () => deleteEntry(Number(btn.dataset.id)));
+    btn.addEventListener('click', () => requestDelete(Number(btn.dataset.id)));
   });
 }
 
-/* ================= كلمة المرور (مخفية) ================= */
+/* ========== كلمة المرور ========== */
 const DELETE_PASSWORD = '2291977';
 let passwordCallback = null;
-
-const passwordModal  = document.getElementById('passwordModal');
-const passwordInput  = document.getElementById('passwordInput');
-const passwordError  = document.getElementById('passwordError');
+const passwordModal = document.getElementById('passwordModal');
+const passwordInput = document.getElementById('passwordInput');
+const passwordError = document.getElementById('passwordError');
 
 function requirePassword(callback){
   passwordCallback = callback;
@@ -531,7 +631,7 @@ function closePasswordModal(){
 }
 
 document.getElementById('confirmPassword').addEventListener('click', () => {
-  if (passwordInput.value === DELETE_PASSWORD){
+  if (passwordInput.value === DELETE_PASSWORD) {
     const cb = passwordCallback;
     closePasswordModal();
     if (cb) cb();
@@ -544,68 +644,67 @@ document.getElementById('confirmPassword').addEventListener('click', () => {
 
 document.getElementById('cancelPassword').addEventListener('click', closePasswordModal);
 document.getElementById('closePassword').addEventListener('click', closePasswordModal);
-
 passwordInput.addEventListener('keydown', e => {
   if (e.key === 'Enter') document.getElementById('confirmPassword').click();
 });
-
 passwordModal.addEventListener('click', e => {
   if (e.target === passwordModal) closePasswordModal();
 });
 
-/* حذف سجل — يتطلب كلمة المرور */
-function deleteEntry(id){
-  requirePassword(() => {
-    setArchive(getArchive().filter(e => e.id !== id));
-    renderArchive();
-    showToast('✓ تم حذف السجل');
+async function requestDelete(id){
+  requirePassword(async () => {
+    try {
+      await removeFromArchive(id);
+      showToast('✓ تم حذف السجل من السحابة');
+    } catch(e) {
+      showToast('❌ فشل الحذف: ' + e.message);
+    }
   });
 }
 
-/* ================= فتح/إغلاق الأرشيف ================= */
+/* ========== فتح/إغلاق الأرشيف ========== */
 function openArchive(){
   archiveSearch.value = '';
   archiveDateFilter.value = '';
-  renderArchive();
   archiveModal.classList.add('show');
+  checkMigrationStatus();
+  renderArchive();
 }
-function closeArchive(){
-  archiveModal.classList.remove('show');
-}
+function closeArchive(){ archiveModal.classList.remove('show'); }
 
 document.getElementById('btnArchive').addEventListener('click', openArchive);
 document.getElementById('closeArchive').addEventListener('click', closeArchive);
 archiveModal.addEventListener('click', e => {
   if (e.target === archiveModal) closeArchive();
 });
-
 archiveSearch.addEventListener('input', renderArchive);
 archiveDateFilter.addEventListener('change', renderArchive);
-
 document.getElementById('btnResetFilter').addEventListener('click', () => {
   archiveSearch.value = '';
   archiveDateFilter.value = '';
   renderArchive();
 });
 
-/* حذف الكل — يتطلب كلمة المرور */
 document.getElementById('btnClearArchive').addEventListener('click', () => {
-  requirePassword(() => {
-    setArchive([]);
-    renderArchive();
-    showToast('✓ تم حذف كل السجلات');
+  requirePassword(async () => {
+    try {
+      await clearAllArchive();
+      showToast('✓ تم حذف كل السجلات');
+    } catch(e) {
+      showToast('❌ فشل الحذف: ' + e.message);
+    }
   });
 });
 
-/* ================= تصدير Excel ================= */
+/* ========== تصدير Excel ========== */
 function exportToExcel(silent = false){
-  const archive = getArchive();
-  if (archive.length === 0){
+  const archive = currentArchive;
+  if (archive.length === 0) {
     if (!silent) alert('الأرشيف فارغ، لا يوجد ما يُصدَّر.');
     return false;
   }
-  if (typeof XLSX === 'undefined'){
-    if (!silent) alert('تعذّر تحميل مكتبة Excel، تحقق من اتصال الإنترنت.');
+  if (typeof XLSX === 'undefined') {
+    if (!silent) alert('تعذّر تحميل مكتبة Excel');
     return false;
   }
 
@@ -632,20 +731,19 @@ document.getElementById('btnExportExcel').addEventListener('click', () => {
   if (exportToExcel(false)) showToast('✓ تم تصدير ملف Excel');
 });
 
-/* حفظ Excel تلقائي بعد إضافة سجل */
 function autoSaveExcel(){
-  if (getArchive().length === 0) return;
+  if (currentArchive.length === 0) return;
   setTimeout(() => {
     try {
       if (exportToExcel(true)) showToast('✓ تم حفظ ملف Excel تلقائياً');
-    } catch(e){ console.log('فشل الحفظ التلقائي:', e); }
+    } catch(e){ console.log('Excel auto-save failed:', e); }
   }, 150);
 }
 
-/* ================= إرسال الصورة فقط عبر واتساب ================= */
+/* ========== واتساب ========== */
 btnWa.addEventListener('click', async () => {
-  saveToArchive();          /* ← حفظ تلقائي في الأرشيف */
-  autoSaveExcel();          /* ← حفظ Excel تلقائياً */
+  await saveToArchive();
+  autoSaveExcel();
 
   const oldText = btnWa.textContent;
   btnWa.disabled = true;
@@ -656,61 +754,48 @@ btnWa.addEventListener('click', async () => {
     const fileName = buildFileName();
     const file     = new File([blob], fileName, { type: 'image/png' });
 
-    if (navigator.canShare && navigator.canShare({ files: [file] })){
-      try{
-        await navigator.share({ files: [file] });   /* صورة فقط بدون نص */
-        hideOverlay(); btnWa.disabled = false;
-        btnWa.textContent = oldText;
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file] });
+        hideOverlay(); btnWa.disabled = false; btnWa.textContent = oldText;
         return;
-      }catch(err){
-        if (err.name === 'AbortError'){
-          hideOverlay(); btnWa.disabled = false;
-          btnWa.textContent = oldText;
+      } catch(err) {
+        if (err.name === 'AbortError') {
+          hideOverlay(); btnWa.disabled = false; btnWa.textContent = oldText;
           return;
         }
-        console.log('المشاركة فشلت:', err);
       }
     }
 
     hideOverlay();
     downloadBlob(blob, fileName);
-    btnWa.disabled = false;
-    btnWa.textContent = oldText;
-
-    alert(
-      'جهازك لا يدعم مشاركة الملفات مباشرة.\n' +
-      'تم حفظ الصورة باسم:\n' + fileName +
-      '\n\nافتح واتساب وأرفق الصورة يدوياً (📎).'
-    );
-  }catch(err){
-    hideOverlay();
-    btnWa.disabled = false;
-    btnWa.textContent = oldText;
+    btnWa.disabled = false; btnWa.textContent = oldText;
+    alert('جهازك لا يدعم مشاركة الملفات مباشرة.\nتم حفظ الصورة: ' + fileName);
+  } catch(err) {
+    hideOverlay(); btnWa.disabled = false; btnWa.textContent = oldText;
     alert('حدث خطأ: ' + err.message);
   }
 });
 
-/* ================= حفظ صورة ================= */
+/* ========== حفظ صورة ========== */
 btnSave.addEventListener('click', async () => {
-  saveToArchive();          /* ← حفظ تلقائي في الأرشيف */
-  autoSaveExcel();          /* ← حفظ Excel تلقائياً */
+  await saveToArchive();
+  autoSaveExcel();
 
   const oldText = btnSave.textContent;
   btnSave.disabled = true;
   showOverlay('جاري حفظ الصورة...');
-  try{
+  try {
     const blob = await cardToBlob();
     downloadBlob(blob, buildFileName());
-  }catch(err){
-    alert('حدث خطأ أثناء حفظ الصورة: ' + err.message);
-  }finally{
-    hideOverlay();
-    btnSave.disabled = false;
-    btnSave.textContent = oldText;
+  } catch(err) {
+    alert('حدث خطأ: ' + err.message);
+  } finally {
+    hideOverlay(); btnSave.disabled = false; btnSave.textContent = oldText;
   }
 });
 
-/* ================= مسح النموذج (يتطلب كلمة المرور) ================= */
+/* ========== مسح النموذج ========== */
 btnClear.addEventListener('click', () => {
   requirePassword(() => {
     ['dateInput','tankers','barrels','cumTankers','cumBarrels'].forEach(id => {
@@ -721,12 +806,13 @@ btnClear.addEventListener('click', () => {
   });
 });
 
-/* ================= Service Worker ================= */
-if ('serviceWorker' in navigator){
+/* ========== بدء التشغيل ========== */
+initArchive();
+
+/* ========== Service Worker ========== */
+if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js')
-      .then(() => console.log('Service Worker جاهز ✓'))
-      .catch(err => console.log('فشل تسجيل SW:', err));
+    navigator.serviceWorker.register('sw.js').catch(err => console.log('SW:', err));
   });
 }
 </script>
