@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="Al-Tuba">
 
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png?v=1">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -49,7 +49,7 @@
   /* تنسيق الشعار */
   .logo-img {
     width: 80px; height: 80px; object-fit: contain; 
-    margin-bottom: 10px; border-radius: 50%; /* شكل دائري احترافي */
+    margin-bottom: 10px; border-radius: 50%;
     background: #fff; padding: 4px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.25);
     display: inline-block;
@@ -272,8 +272,8 @@
 
   <div class="card" id="card">
     <div class="head">
-      <!-- هنا تم تعديل اسم الصورة ليكون icon-192.png -->
-      <img src="icon-192.png" alt="Tuba Logo" class="logo-img" onerror="this.style.display='none'">
+      <!-- أضفنا ?v=1 لإجبار المتصفح على تحميل الصورة الجديدة -->
+      <img src="icon-192.png?v=1" alt="Tuba Logo" class="logo-img" onerror="this.style.display='none'">
       <h1>Al-Tuba Oil Depot</h1>
       <h2>Oil Tanker Loading Platforms</h2>
     </div>
